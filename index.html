@@ -190,7 +190,7 @@ textarea:focus{border-color:#51408d;background:#fff}
 
 <script>
 // Ocultar UI inmediatamente si es un enlace de propuesta compartida
-if(location.hash.startsWith('#propuesta=')){document.body.style.visibility='hidden';}
+if(location.hash.startsWith('#propuesta=')||new URLSearchParams(location.search).get('p')){document.body.style.visibility='hidden';}
 
 // ── Estado ────────────────────────────────────────────────────────
 let STATE = {phase:'upload', extracted:null, analysis:null, html:null};
@@ -434,14 +434,26 @@ function downloadPdf(){
 }
 
 // ── Compartir enlace ──────────────────────────────────────────────
-function compartirEnlace(){
+async function compartirEnlace(){
   if(!STATE.extracted||!STATE.analysis)return;
-  const json=JSON.stringify({extracted:STATE.extracted,analysis:STATE.analysis});
-  const data=btoa(unescape(encodeURIComponent(json)));
-  const url=location.origin+location.pathname+'#propuesta='+data;
-  navigator.clipboard.writeText(url)
-    .then(()=>showToast('✓ Enlace copiado — compártelo con tu cliente'))
-    .catch(()=>prompt('Copia este enlace y compártelo:',url));
+  const btn=document.getElementById('btnCompartir');
+  const orig=btn.innerHTML;
+  btn.disabled=true;btn.textContent='Generando...';
+  try{
+    const res=await fetch('/.netlify/functions/propuesta',{
+      method:'POST',
+      body:JSON.stringify({extracted:STATE.extracted,analysis:STATE.analysis})
+    });
+    if(!res.ok)throw new Error();
+    const {id}=await res.json();
+    const url=location.origin+'/?p='+id;
+    await navigator.clipboard.writeText(url).catch(()=>prompt('Copia este enlace:',url));
+    showToast('✓ Enlace copiado — compártelo con tu cliente');
+  }catch(e){
+    showToast('Error generando enlace. Intenta de nuevo.');
+  }finally{
+    btn.disabled=false;btn.innerHTML=orig;
+  }
 }
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -703,24 +715,34 @@ window.addEventListener('scroll',()=>{
 }
 
 // ── Abrir propuesta desde enlace compartido ───────────────────────
+function _mostrarPropuesta(extracted,analysis){
+  const html=buildHTML(extracted,analysis);
+  const blob=new Blob([html],{type:'text/html'});
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#fff';
+  const iframe=document.createElement('iframe');
+  iframe.style.cssText='width:100%;height:100%;border:none';
+  iframe.src=URL.createObjectURL(blob);
+  overlay.appendChild(iframe);
+  document.body.appendChild(overlay);
+  document.body.style.visibility='visible';
+}
 (function(){
+  // Enlace corto: ?p=ID
+  const pid=new URLSearchParams(location.search).get('p');
+  if(pid){
+    fetch('/.netlify/functions/propuesta?id='+encodeURIComponent(pid))
+      .then(r=>r.ok?r.json():Promise.reject())
+      .then(d=>{if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis);})
+      .catch(()=>{document.body.style.visibility='visible';});
+    return;
+  }
+  // Enlace legacy con hash largo (compatibilidad)
   const h=location.hash;
   if(!h.startsWith('#propuesta='))return;
   try{
-    const data=JSON.parse(decodeURIComponent(escape(atob(h.slice(11)))));
-    if(data.extracted&&data.analysis){
-      const html=buildHTML(data.extracted,data.analysis);
-      const blob=new Blob([html],{type:'text/html'});
-      const url=URL.createObjectURL(blob);
-      const overlay=document.createElement('div');
-      overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#fff';
-      const iframe=document.createElement('iframe');
-      iframe.style.cssText='width:100%;height:100%;border:none';
-      iframe.src=url;
-      overlay.appendChild(iframe);
-      document.body.appendChild(overlay);
-      document.body.style.visibility='visible';
-    }
+    const d=JSON.parse(decodeURIComponent(escape(atob(h.slice(11)))));
+    if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis);
   }catch(e){console.error('Enlace inválido',e);}
 })();
 
