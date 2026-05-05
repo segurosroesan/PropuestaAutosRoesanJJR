@@ -279,7 +279,6 @@ function readBase64(file){
 // ── Procesar PDF ──────────────────────────────────────────────────
 async function processFile(file){
   if(!file||file.type!=='application/pdf'){showError('Por favor sube un archivo .pdf válido.');return;}
-  if(!getKey().startsWith('sk-ant')){showError('Ingresa una API Key válida de Anthropic.');return;}
   show('processing');
   document.getElementById('logContainer').innerHTML='';
   setProgress(0);
