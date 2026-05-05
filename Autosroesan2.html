@@ -62,14 +62,9 @@ textarea:focus{border-color:#51408d;background:#fff}
 <div class="center">
   <div id="screen-upload">
     <div class="card">
-      <span class="eyebrow">Configuración</span>
-      <h1>Tu API Key de Anthropic</h1>
-      <p class="lead">Solo se usa en tu navegador local. No se envía a ningún servidor externo.</p>
-      <div class="key-wrap">
-        <input type="password" id="apiKey" placeholder="sk-ant-api03-..." oninput="checkKey()"/>
-        <span class="key-status" id="keyStatus" style="background:#f1f5f9;color:#94a3b8">Sin clave</span>
-      </div>
-      <span class="eyebrow" style="margin-top:8px">Sube el PDF de cotización</span>
+      <span class="eyebrow">Nueva propuesta</span>
+      <h1>Generador de propuestas</h1>
+      <p class="lead">Sube el PDF de cotización y la IA genera la propuesta en segundos.</p>
       <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()"
            ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
         <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" width="52" height="52" style="margin-bottom:12px">
@@ -80,10 +75,6 @@ textarea:focus{border-color:#51408d;background:#fff}
         <div style="font-size:17px;font-weight:600;color:#334155;margin-bottom:6px">Arrastra el PDF aquí</div>
         <div style="font-size:14px;color:#64748b">o haz clic para seleccionar · solo archivos .pdf</div>
         <input type="file" id="fileInput" accept=".pdf" style="display:none" onchange="onFileSelect(event)"/>
-      </div>
-      <div style="margin-top:24px;padding:16px 20px;background:rgba(97,187,228,0.07);border:1px solid rgba(97,187,228,0.25);border-radius:14px;font-size:13px;color:#475569;line-height:1.6">
-        <strong style="color:#0f172a">¿Cómo obtener la API Key?</strong><br/>
-        Ve a <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:#51408d">console.anthropic.com → API Keys</a>, crea una clave y pégala arriba.
       </div>
     </div>
   </div>
@@ -246,23 +237,6 @@ function renderSteps(){
   }).join('');
 }
 
-// ── API Key ───────────────────────────────────────────────────────
-function checkKey(){
-  const k=document.getElementById('apiKey').value.trim();
-  const el=document.getElementById('keyStatus');
-  if(k.startsWith('sk-ant')){
-    el.style.background='rgba(34,197,94,0.1)';el.style.color='#15803d';el.textContent='✓ OK';
-    localStorage.setItem('roesan_api_key',k);
-  } else if(k.length>5){el.style.background='rgba(239,68,68,0.1)';el.style.color='#b91c1c';el.textContent='Inválida';}
-  else{el.style.background='#f1f5f9';el.style.color='#94a3b8';el.textContent='Sin clave';}
-}
-function getKey(){return document.getElementById('apiKey').value.trim();}
-
-// Cargar API key guardada
-(function(){
-  const saved=localStorage.getItem('roesan_api_key');
-  if(saved){document.getElementById('apiKey').value=saved;checkKey();}
-})();
 
 // ── Drag & Drop ───────────────────────────────────────────────────
 function onDragOver(e){e.preventDefault();document.getElementById('dropzone').classList.add('drag');}
@@ -283,11 +257,11 @@ function setProgress(pct){
   document.getElementById('progPct').textContent=pct+'%';
 }
 
-// ── Claude API ────────────────────────────────────────────────────
+// ── Claude API (vía Netlify Function) ────────────────────────────
 async function callClaude(messages,system){
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
+  const res=await fetch('/.netlify/functions/claude',{
     method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-opus-4-5',max_tokens:8000,system,messages})
   });
   if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`HTTP ${res.status}`);}
