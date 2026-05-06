@@ -305,10 +305,29 @@ Responde ÚNICAMENTE con JSON válido sin markdown:
     addLog(`Vehículo: ${extracted.vehiculo.marca} ${extracted.vehiculo.año} — ${extracted.cotizaciones.length} aseguradoras`,'ok');
     setProgress(55);
     addLog('Analizando pólizas…');
-    const analysis=await callClaude([{role:'user',content:`Eres asesor senior de Roesan Seguros Colombia. Analiza y recomienda.
+    const analysis=await callClaude([{role:'user',content:`Eres asesor senior de Roesan Seguros Colombia. Analiza las cotizaciones y genera una recomendación profesional y consultiva.
+
+CRITERIOS DE DECISIÓN (ponderación):
+- Precio / prima anual: 35%
+- Responsabilidad Civil (RC): 30%
+- Deducibles (daño parcial, hurto, fenómenos naturales): 20%
+- Coberturas adicionales (grúa, carro taller, vehículo de reemplazo, asistencia jurídica, accidentes personales): 15%
+
+REGLAS:
+1. Normalmente recomienda la opción más económica SI mantiene buenas coberturas.
+2. Si la diferencia de precio entre dos opciones es menor al 10-15%, prioriza la que tenga mejor RC, mejores deducibles y mejores coberturas adicionales.
+3. Nunca recomiendes automáticamente la más barata si sus coberturas son claramente inferiores.
+4. JAMÁS hables negativamente de otras aseguradoras ni uses comparaciones despectivas.
+5. Destaca positivamente por qué la recomendada sobresale.
+6. Presenta la alternativa como otra opción válida, explicando en qué escenario específico le conviene más al cliente.
+7. Cierra siempre con un mensaje cercano indicando que ambas opciones pueden ser buenas según las prioridades del cliente y que la decisión final es suya.
+
+TONO: Cercano, profesional, consultivo. Nunca comparativo negativo.
+
 Responde ÚNICAMENTE con JSON sin markdown:
 {"recomendada":"","plan_recomendado":"","razon_principal":"","puntos_fuertes":["","",""],"advertencia":"","analisis_general":"","alternativa":"","razon_alternativa":""}
-DATOS: ${JSON.stringify(extracted)}`}],'Eres experto en seguros colombianos. Responde SOLO con JSON válido.');
+
+DATOS: ${JSON.stringify(extracted)}`}],'Eres experto en seguros de vehículos colombianos. Responde SOLO con JSON válido.');
     STATE.analysis=analysis;
     addLog(`Recomendación: ${analysis.recomendada} — ${analysis.plan_recomendado}`,'ok');
     setProgress(90);
@@ -397,10 +416,29 @@ async function regenerarRecomendacion(){
   document.getElementById('regenSpinner').style.display='flex';
   document.getElementById('btnRegen').disabled=true;
   try{
-    const analysis=await callClaude([{role:'user',content:`Eres asesor senior de Roesan Seguros Colombia. Genera una NUEVA recomendación diferente a la anterior, con enfoque distinto. 
+    const analysis=await callClaude([{role:'user',content:`Eres asesor senior de Roesan Seguros Colombia. Genera una NUEVA recomendación con enfoque distinto al anterior.
+
+CRITERIOS DE DECISIÓN (ponderación):
+- Precio / prima anual: 35%
+- Responsabilidad Civil (RC): 30%
+- Deducibles (daño parcial, hurto, fenómenos naturales): 20%
+- Coberturas adicionales (grúa, carro taller, vehículo de reemplazo, asistencia jurídica, accidentes personales): 15%
+
+REGLAS:
+1. Normalmente recomienda la opción más económica SI mantiene buenas coberturas.
+2. Si la diferencia de precio entre dos opciones es menor al 10-15%, prioriza la que tenga mejor RC, mejores deducibles y mejores coberturas adicionales.
+3. Nunca recomiendes automáticamente la más barata si sus coberturas son claramente inferiores.
+4. JAMÁS hables negativamente de otras aseguradoras ni uses comparaciones despectivas.
+5. Destaca positivamente por qué la recomendada sobresale.
+6. Presenta la alternativa como otra opción válida, explicando en qué escenario específico le conviene más al cliente.
+7. Cierra siempre con un mensaje cercano indicando que ambas opciones pueden ser buenas según las prioridades del cliente y que la decisión final es suya.
+
+TONO: Cercano, profesional, consultivo. Nunca comparativo negativo.
+
 Responde ÚNICAMENTE con JSON sin markdown:
 {"recomendada":"","plan_recomendado":"","razon_principal":"","puntos_fuertes":["","",""],"advertencia":"","analisis_general":"","alternativa":"","razon_alternativa":""}
-DATOS: ${JSON.stringify(STATE.extracted)}`}],'Eres experto en seguros colombianos. Responde SOLO con JSON válido.');
+
+DATOS: ${JSON.stringify(STATE.extracted)}`}],'Eres experto en seguros de vehículos colombianos. Responde SOLO con JSON válido.');
     STATE.analysis=analysis;
     STATE.html=buildHTML(STATE.extracted,analysis);
     renderRecView(analysis);
@@ -578,7 +616,7 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
       <h1 style="font-family:'Philosopher',Georgia,serif;font-size:clamp(30px,5vw,58px);color:white;line-height:1.05;font-weight:400;letter-spacing:-.018em;margin-bottom:16px">
         Todo riesgo para tu <em style="color:#61bbe4;font-style:italic">${ext.vehiculo.marca} ${ext.vehiculo.año}</em>
       </h1>
-      <div style="font-size:15px;color:rgba(255,255,255,.6);margin-top:-10px;margin-bottom:18px;letter-spacing:.04em">${ext.vehiculo.placa}</div>
+      <div style="margin-top:-8px;margin-bottom:20px"><span style="font-size:13px;color:rgba(255,255,255,.9);font-weight:600;letter-spacing:.08em">Placa </span><span style="font-size:22px;color:#61bbe4;font-weight:700;letter-spacing:.1em">${ext.vehiculo.placa}</span></div>
       <p style="font-size:17px;color:rgba(255,255,255,.78);line-height:1.5;font-weight:300;margin-bottom:28px;max-width:480px">
         Comparamos ${ext.cotizaciones.length} aseguradoras con tu perfil. Esta es la propuesta que mejor balancea precio, coberturas y servicio.
       </p>
