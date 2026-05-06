@@ -609,14 +609,14 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
   <div style="position:absolute;top:-80px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(97,187,228,.22),transparent 70%)"></div>
   <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:40px;padding:56px 48px;align-items:end;position:relative;z-index:2" class="hgrid">
     <div>
-      <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:9999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.9);margin-bottom:20px">
-        <span style="width:7px;height:7px;border-radius:50%;background:#61bbe4"></span>
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:7px 18px;border-radius:9999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);font-size:clamp(13px,1.8vw,17px);font-weight:600;letter-spacing:.04em;color:rgba(255,255,255,.9);margin-bottom:20px">
+        <span style="width:7px;height:7px;border-radius:50%;background:#61bbe4;flex-shrink:0"></span>
         Propuesta para ${ext.cliente.nombre} · Folio ${ext.folio}
       </div>
       <h1 style="font-family:'Philosopher',Georgia,serif;font-size:clamp(30px,5vw,58px);color:white;line-height:1.05;font-weight:400;letter-spacing:-.018em;margin-bottom:16px">
         Todo riesgo para tu <em style="color:#61bbe4;font-style:italic">${ext.vehiculo.marca} ${ext.vehiculo.año}</em>
       </h1>
-      <div style="margin-top:-8px;margin-bottom:20px"><span style="font-size:13px;color:rgba(255,255,255,.9);font-weight:600;letter-spacing:.08em">Placa </span><span style="font-size:22px;color:#61bbe4;font-weight:700;letter-spacing:.1em">${ext.vehiculo.placa}</span></div>
+      <div style="margin-top:-8px;margin-bottom:20px"><span style="font-size:22px;color:rgba(255,255,255,.9);font-weight:700;letter-spacing:.1em">Placa: </span><span style="font-size:22px;color:#61bbe4;font-weight:700;letter-spacing:.1em">${ext.vehiculo.placa}</span></div>
       <p style="font-size:17px;color:rgba(255,255,255,.78);line-height:1.5;font-weight:300;margin-bottom:28px;max-width:480px">
         Comparamos ${ext.cotizaciones.length} aseguradoras con tu perfil. Esta es la propuesta que mejor balancea precio, coberturas y servicio.
       </p>
