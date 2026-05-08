@@ -177,6 +177,31 @@ textarea:focus{border-color:#51408d;background:#fff}
       </div>
     </div>
 
+    <!-- Póliza recomendada -->
+    <div class="card" id="polizaCard">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div>
+          <span class="eyebrow">Póliza recomendada</span>
+          <div style="font-size:13px;color:#64748b">Sube el PDF de la póliza seleccionada para personalizar los beneficios en la propuesta</div>
+        </div>
+      </div>
+      <div id="polizaUploadArea">
+        <div class="dropzone" style="padding:28px 24px" onclick="document.getElementById('polizaInput').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" width="36" height="36" style="margin-bottom:8px"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+          <div style="font-size:15px;font-weight:600;color:#334155;margin-bottom:4px">Sube el PDF de la póliza seleccionada</div>
+          <div style="font-size:13px;color:#94a3b8">Extrae los beneficios exactos de esa aseguradora · solo .pdf</div>
+          <input type="file" id="polizaInput" accept=".pdf" style="display:none" onchange="onPolizaSelect(event)"/>
+        </div>
+      </div>
+      <div id="polizaSpinner" style="display:none;align-items:center;gap:10px;padding:14px;color:#64748b;font-size:14px">
+        <div class="spinner"></div> Extrayendo beneficios de la póliza...
+      </div>
+      <div id="polizaOk" style="display:none;align-items:center;gap:10px;padding:12px 14px;background:rgba(34,197,94,0.07);border-radius:10px;font-size:14px;color:#15803d;font-weight:500">
+        ✓ <span id="polizaOkMsg"></span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="resetPoliza()">Cambiar PDF</button>
+      </div>
+    </div>
+
     <!-- Cotizaciones -->
     <div class="card" id="quotesCard"></div>
 
@@ -200,7 +225,7 @@ textarea:focus{border-color:#51408d;background:#fff}
 if(location.hash.startsWith('#propuesta=')||new URLSearchParams(location.search).get('p')){document.body.style.visibility='hidden';}
 
 // ── Estado ────────────────────────────────────────────────────────
-let STATE = {phase:'upload', extracted:null, analysis:null, html:null};
+let STATE = {phase:'upload', extracted:null, analysis:null, html:null, beneficios:null};
 
 // ── Formato moneda COP ────────────────────────────────────────────
 function fmtCOP(n){
@@ -339,7 +364,7 @@ DATOS: ${JSON.stringify(extracted)}`}],'Eres experto en seguros de vehículos co
     addLog(`Recomendación: ${analysis.recomendada} — ${analysis.plan_recomendado}`,'ok');
     setProgress(90);
     addLog('Generando presentación…');
-    STATE.html=buildHTML(extracted,analysis);
+    STATE.html=buildHTML(extracted,analysis,STATE.beneficios);
     addLog('¡Listo!','ok');
     setProgress(100);
     setTimeout(()=>renderDone(extracted,analysis),600);
@@ -404,7 +429,7 @@ function guardarEdicion(){
   STATE.analysis.plan_recomendado=document.getElementById('editPlan').value;
   STATE.analysis.razon_principal=document.getElementById('editRazon').value;
   STATE.analysis.analisis_general=document.getElementById('editAnalisis').value;
-  STATE.html=buildHTML(STATE.extracted,STATE.analysis);
+  STATE.html=buildHTML(STATE.extracted,STATE.analysis,STATE.beneficios);
   renderRecView(STATE.analysis);
   cancelarEdicion();
 }
@@ -447,7 +472,7 @@ Responde ÚNICAMENTE con JSON sin markdown:
 
 DATOS: ${JSON.stringify(STATE.extracted)}`}],'Eres experto en seguros de vehículos colombianos. Responde SOLO con JSON válido.');
     STATE.analysis=analysis;
-    STATE.html=buildHTML(STATE.extracted,analysis);
+    STATE.html=buildHTML(STATE.extracted,analysis,STATE.beneficios);
     renderRecView(analysis);
     renderQuotes(STATE.extracted,analysis);
   }catch(e){alert('Error regenerando: '+e.message);}
@@ -487,7 +512,7 @@ async function compartirEnlace(){
   try{
     const res=await fetch('/.netlify/functions/propuesta',{
       method:'POST',
-      body:JSON.stringify({extracted:STATE.extracted,analysis:STATE.analysis})
+      body:JSON.stringify({extracted:STATE.extracted,analysis:STATE.analysis,beneficios:STATE.beneficios})
     });
     if(!res.ok)throw new Error();
     const {id}=await res.json();
@@ -507,11 +532,63 @@ function showToast(msg){
 }
 
 // ── Reset ─────────────────────────────────────────────────────────
-function reset(){STATE={phase:'upload',extracted:null,analysis:null,html:null};show('upload');}
+function reset(){STATE={phase:'upload',extracted:null,analysis:null,html:null,beneficios:null};show('upload');}
 function showError(msg){document.getElementById('errMsg').textContent=msg;show('error');}
 
+// ── Icono beneficio ────────────────────────────────────────────────
+function beneficioIcon(nombre){
+  const n=(nombre||'').toLowerCase();
+  if(n.includes('grú')||n.includes('grua')||n.includes('remolque'))return'🚛';
+  if(n.includes('mecánico')||n.includes('mecanico')||n.includes('batería')||n.includes('pinchazo'))return'🔧';
+  if(n.includes('conductor')||n.includes('chofer'))return'👤';
+  if(n.includes('hotel')||n.includes('hospedaje')||n.includes('alojamiento'))return'🏨';
+  if(n.includes('gps')||n.includes('rastreo')||n.includes('localización'))return'📍';
+  if(n.includes('jurídic')||n.includes('juridic')||n.includes('abogado'))return'⚖️';
+  if(n.includes('lavado')||n.includes('laminado'))return'✨';
+  if(n.includes('fianza'))return'🔑';
+  if(n.includes('médic')||n.includes('medic')||n.includes('salud'))return'🏥';
+  if(n.includes('carro')||n.includes('reemplazo'))return'🚗';
+  return'🛡️';
+}
+
+// ── Póliza recomendada ─────────────────────────────────────────────
+function onPolizaSelect(e){const f=e.target.files[0];if(f)procesarPolizaRecomendada(f);}
+async function procesarPolizaRecomendada(file){
+  if(!file||file.type!=='application/pdf')return;
+  document.getElementById('polizaUploadArea').style.display='none';
+  document.getElementById('polizaSpinner').style.display='flex';
+  document.getElementById('polizaOk').style.display='none';
+  try{
+    const b64=await readBase64(file);
+    const result=await callClaude([{role:'user',content:[
+      {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
+      {type:'text',text:`Analiza este PDF de póliza de seguro de auto colombiano y extrae los beneficios, coberturas y asistencias incluidas.
+Responde ÚNICAMENTE con JSON válido sin markdown:
+{"aseguradora":"","plan":"","beneficios":[{"nombre":"","descripcion":""}]}
+Máximo 8 beneficios más relevantes para el asegurado. Descripciones de máximo 12 palabras cada una.`}
+    ]}],'Eres experto en seguros colombianos. Responde SOLO con JSON válido.');
+    STATE.beneficios=result.beneficios||[];
+    STATE.html=buildHTML(STATE.extracted,STATE.analysis,STATE.beneficios);
+    const msg=`${result.beneficios?.length||0} beneficios extraídos — ${result.aseguradora||'póliza procesada'}`;
+    document.getElementById('polizaOkMsg').textContent=msg;
+    document.getElementById('polizaSpinner').style.display='none';
+    document.getElementById('polizaOk').style.display='flex';
+  }catch(e){
+    document.getElementById('polizaSpinner').style.display='none';
+    document.getElementById('polizaUploadArea').style.display='block';
+    alert('Error extrayendo beneficios: '+e.message);
+  }
+}
+function resetPoliza(){
+  STATE.beneficios=null;
+  STATE.html=buildHTML(STATE.extracted,STATE.analysis);
+  document.getElementById('polizaInput').value='';
+  document.getElementById('polizaOk').style.display='none';
+  document.getElementById('polizaUploadArea').style.display='block';
+}
+
 // ── Builder HTML final ────────────────────────────────────────────
-function buildHTML(ext,an){
+function buildHTML(ext,an,beneficios){
   const rec=ext.cotizaciones.find(c=>c.aseguradora.toLowerCase().includes(an.recomendada.toLowerCase()))||ext.cotizaciones[0];
   const sorted=[...ext.cotizaciones].sort((a,b)=>a.prima_anual-b.prima_anual);
   const minP=sorted[0].prima_anual,maxP=sorted[sorted.length-1].prima_anual;
@@ -568,6 +645,8 @@ function buildHTML(ext,an){
 
   const heroRC=fmtRC(rec.rc_limite);
   const heroValor=fmtValor(ext.vehiculo.valor_asegurado);
+  const _DA=`<div class="rs-assist-card"><span class="num">01</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></div><h4>Grúa ilimitada</h4><p>Sin límite de kilómetros en cualquier carretera del país.</p></div><div class="rs-assist-card"><span class="num">02</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><h4>Mecánico en sitio</h4><p>Pinchazos, batería descargada, llave dentro del carro.</p></div><div class="rs-assist-card"><span class="num">03</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg></div><h4>Conductor elegido</h4><p>Si te excediste en una reunión, llevamos tu carro y a ti a casa.</p></div><div class="rs-assist-card"><span class="num">04</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><h4>Hospedaje y traslado</h4><p>Si te varas lejos de casa, cubrimos hotel y transporte.</p></div><div class="rs-assist-card"><span class="num">05</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h4>GPS y rastreo</h4><p>Localización inmediata en caso de hurto o emergencia.</p></div><div class="rs-assist-card"><span class="num">06</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div><h4>Adelanto de fianza</h4><p>Para liberar el vehículo si quedó retenido por la autoridad.</p></div><div class="rs-assist-card"><span class="num">07</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><h4>Línea jurídica</h4><p>Abogado disponible 24/7 para orientarte en el siniestro.</p></div><div class="rs-assist-card"><span class="num">08</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg></div><h4>Lavado y laminado</h4><p>Beneficios anuales en talleres autorizados de la red.</p></div>`;
+  const beneficiosHtml=(beneficios&&beneficios.length>0)?beneficios.map((b,i)=>`<div class="rs-assist-card"><span class="num">${String(i+1).padStart(2,'0')}</span><div class="ico" style="font-size:20px;line-height:1;background:linear-gradient(135deg,rgba(97,187,228,.25),rgba(81,64,141,.15));display:flex;align-items:center;justify-content:center">${beneficioIcon(b.nombre)}</div><h4>${b.nombre}</h4><p>${b.descripcion}</p></div>`).join(''):_DA;
 
   return `<!DOCTYPE html>
 <html lang="es"><head>
@@ -833,14 +912,7 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
       <p class="rs-lead">No solo cubrimos el siniestro grande. La aseguradora seleccionada te respalda también en los días normales: el pinchazo, la batería, la llave perdida.</p>
     </div>
     <div class="rs-assist">
-      <div class="rs-assist-card"><span class="num">01</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></div><h4>Grúa ilimitada</h4><p>Sin límite de kilómetros en cualquier carretera del país.</p></div>
-      <div class="rs-assist-card"><span class="num">02</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><h4>Mecánico en sitio</h4><p>Pinchazos, batería descargada, llave dentro del carro.</p></div>
-      <div class="rs-assist-card"><span class="num">03</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg></div><h4>Conductor elegido</h4><p>Si te excediste en una reunión, llevamos tu carro y a ti a casa.</p></div>
-      <div class="rs-assist-card"><span class="num">04</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><h4>Hospedaje y traslado</h4><p>Si te varas lejos de casa, cubrimos hotel y transporte.</p></div>
-      <div class="rs-assist-card"><span class="num">05</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h4>GPS y rastreo</h4><p>Localización inmediata en caso de hurto o emergencia.</p></div>
-      <div class="rs-assist-card"><span class="num">06</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div><h4>Adelanto de fianza</h4><p>Para liberar el vehículo si quedó retenido por la autoridad.</p></div>
-      <div class="rs-assist-card"><span class="num">07</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><h4>Línea jurídica</h4><p>Abogado disponible 24/7 para orientarte en el siniestro.</p></div>
-      <div class="rs-assist-card"><span class="num">08</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg></div><h4>Lavado y laminado</h4><p>Beneficios anuales en talleres autorizados de la red.</p></div>
+      ${beneficiosHtml}
     </div>
     <div class="rs-note">
       <svg viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -970,8 +1042,8 @@ window.addEventListener('scroll',()=>{
 }
 
 // ── Abrir propuesta desde enlace compartido ───────────────────────
-function _mostrarPropuesta(extracted,analysis){
-  const html=buildHTML(extracted,analysis);
+function _mostrarPropuesta(extracted,analysis,beneficios){
+  const html=buildHTML(extracted,analysis,beneficios);
   const blob=new Blob([html],{type:'text/html'});
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#fff';
@@ -988,7 +1060,7 @@ function _mostrarPropuesta(extracted,analysis){
   if(pid){
     fetch('/.netlify/functions/propuesta?id='+encodeURIComponent(pid))
       .then(r=>r.ok?r.json():Promise.reject())
-      .then(d=>{if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis);})
+      .then(d=>{if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis,d.beneficios);})
       .catch(()=>{document.body.style.visibility='visible';});
     return;
   }
@@ -997,7 +1069,7 @@ function _mostrarPropuesta(extracted,analysis){
   if(!h.startsWith('#propuesta='))return;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(h.slice(11)))));
-    if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis);
+    if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis,d.beneficios);
   }catch(e){console.error('Enlace inválido',e);}
 })();
 
