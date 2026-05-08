@@ -65,6 +65,13 @@ textarea:focus{border-color:#51408d;background:#fff}
       <span class="eyebrow">Nueva propuesta</span>
       <h1>Generador de propuestas</h1>
       <p class="lead">Sube el PDF de cotización y la IA genera la propuesta en segundos.</p>
+      <div id="localKeyWrap" style="display:none;margin-bottom:20px">
+        <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">API Key de Anthropic <span style="color:#94a3b8;font-weight:400;text-transform:none">(solo en uso local)</span></div>
+        <div class="key-wrap">
+          <input type="password" id="apiKey" placeholder="sk-ant-api03-..." oninput="checkKey()"/>
+          <span class="key-status" id="keyStatus" style="background:#f1f5f9;color:#94a3b8">Sin clave</span>
+        </div>
+      </div>
       <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()"
            ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
         <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" width="52" height="52" style="margin-bottom:12px">
@@ -737,10 +744,220 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
 </div>
 </div></div>
 
-<footer style="background:#1e103c;padding:28px 0"><div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12px;color:rgba(255,255,255,.4)">
-  <span>© 2026 ORGANIZACIÓN DE SEGUROS ROESAN LTDA</span>
-  <span>Propuesta no vinculante · sujeta a estudio de la aseguradora</span>
-</div></footer>
+<section id="roesan-extras" style="--rs-purple:#51408d;--rs-purple-800:#2a2960;--rs-purple-950:#1e103c;--rs-cyan:#61bbe4;--rs-cyan-300:#a8e1f3;--rs-cyan-400:#89d4f0;--rs-yellow:#fddf45;--rs-slate-50:#f8fafc;--rs-slate-100:#f1f5f9;--rs-slate-200:#e2e8f0;--rs-slate-400:#94a3b8;--rs-slate-500:#64748b;--rs-slate-700:#334155;--rs-slate-900:#0f172a;font-family:'Roboto',system-ui,sans-serif;color:#334155;">
+<style>
+#roesan-extras *{box-sizing:border-box;}
+#roesan-extras .rs-container{max-width:1100px;margin:0 auto;padding:0 28px;}
+#roesan-extras .rs-section{padding:80px 0;position:relative;}
+#roesan-extras .rs-eyebrow{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.20em;color:#61bbe4;display:inline-block;margin-bottom:14px;}
+#roesan-extras .rs-eyebrow.on-dark{color:#89d4f0;}
+#roesan-extras .rs-h2{font-family:'Philosopher',Georgia,serif;font-weight:500;font-size:clamp(28px,4vw,46px);margin:0 0 16px;line-height:1.1;letter-spacing:-.015em;color:#0f172a;}
+#roesan-extras .rs-h2 em{font-style:italic;color:#51408d;}
+#roesan-extras .rs-h2.on-dark{color:#fff;}
+#roesan-extras .rs-h2.on-dark em{color:#89d4f0;}
+#roesan-extras .rs-lead{font-size:18px;color:#64748b;line-height:1.55;font-weight:300;margin:0;max-width:620px;}
+#roesan-extras .rs-section-head{max-width:720px;margin-bottom:44px;}
+#roesan-extras .rs-note{margin-top:24px;padding:18px 22px;background:rgba(253,223,69,.10);border:1px solid rgba(253,223,69,.45);border-radius:14px;font-size:14px;color:#334155;line-height:1.55;display:flex;gap:12px;align-items:flex-start;}
+#roesan-extras .rs-assist{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+#roesan-extras .rs-assist-card{background:#fff;border-radius:20px;padding:28px 24px;border:1px solid rgba(226,232,240,.8);position:relative;overflow:hidden;transition:all .3s ease;}
+#roesan-extras .rs-assist-card:hover{transform:translateY(-5px);box-shadow:0 14px 36px rgba(15,23,42,.10);border-color:#a8e1f3;}
+#roesan-extras .rs-assist-card .ico{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#a8e1f3,#61bbe4);color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 6px 16px rgba(97,187,228,.3);}
+#roesan-extras .rs-assist-card .ico svg{width:22px;height:22px;}
+#roesan-extras .rs-assist-card h4{font-weight:700;font-size:16px;color:#0f172a;margin:0 0 6px;}
+#roesan-extras .rs-assist-card p{font-size:13px;color:#64748b;line-height:1.5;margin:0;}
+#roesan-extras .rs-assist-card .num{position:absolute;top:22px;right:22px;font-family:'Philosopher',Georgia,serif;font-size:13px;color:#e2e8f0;font-weight:700;}
+#roesan-extras .rs-stepper-wrap{background:linear-gradient(135deg,#1e103c 0%,#2a2960 100%);border-radius:28px;padding:52px;color:#fff;position:relative;overflow:hidden;}
+#roesan-extras .rs-stepper-wrap::before{content:"";position:absolute;top:-100px;right:-100px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(97,187,228,.18),transparent 70%);}
+#roesan-extras .rs-stepper-inner{position:relative;z-index:1;}
+#roesan-extras .rs-stepper-head{max-width:580px;margin-bottom:36px;}
+#roesan-extras .rs-stepper-head p{color:rgba(255,255,255,.75);font-size:16px;line-height:1.55;margin:0;}
+#roesan-extras .rs-stepper{display:grid;grid-template-columns:260px 1fr;gap:36px;}
+#roesan-extras .rs-step-list{display:flex;flex-direction:column;gap:5px;}
+#roesan-extras .rs-step-item{display:flex;gap:14px;align-items:flex-start;padding:12px 14px;border-radius:12px;cursor:pointer;transition:all .25s;border:1px solid transparent;background:transparent;text-align:left;width:100%;font-family:'Roboto',sans-serif;color:rgba(255,255,255,.6);}
+#roesan-extras .rs-step-item:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.9);}
+#roesan-extras .rs-step-item.active{background:rgba(97,187,228,.10);color:#fff;border-color:rgba(97,187,228,.28);}
+#roesan-extras .rs-step-item .num{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-family:'Philosopher',Georgia,serif;font-size:13px;font-weight:600;}
+#roesan-extras .rs-step-item.active .num{background:#61bbe4;border-color:#61bbe4;color:#fff;}
+#roesan-extras .rs-step-item.done .num{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.38);color:#4ade80;}
+#roesan-extras .rs-step-item .label{font-size:13px;font-weight:500;padding-top:5px;}
+#roesan-extras .rs-step-detail{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:20px;padding:32px;display:flex;flex-direction:column;justify-content:space-between;min-height:300px;}
+#roesan-extras .rs-step-detail .step-num{font-family:'Philosopher',Georgia,serif;font-size:72px;line-height:1;color:rgba(97,187,228,.25);font-weight:500;margin-bottom:6px;}
+#roesan-extras .rs-step-detail h3{font-family:'Philosopher',Georgia,serif;font-weight:500;font-size:26px;color:#fff;margin:0 0 10px;line-height:1.15;}
+#roesan-extras .rs-step-detail p{font-size:15px;color:rgba(255,255,255,.75);line-height:1.6;margin:0;}
+#roesan-extras .rs-step-action{margin-top:20px;display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:9999px;background:rgba(97,187,228,.14);border:1px solid rgba(97,187,228,.28);color:#a8e1f3;font-size:13px;font-weight:600;width:fit-content;}
+#roesan-extras .rs-step-progress{display:flex;gap:5px;margin-top:20px;}
+#roesan-extras .rs-step-progress .dot{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.10);transition:background .3s;}
+#roesan-extras .rs-step-progress .dot.active{background:#89d4f0;}
+#roesan-extras .rs-roesan-cta{margin-top:28px;padding:22px 26px;background:rgba(253,223,69,.08);border:1px solid rgba(253,223,69,.28);border-radius:18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+#roesan-extras .rs-roesan-cta .badge{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:#fddf45;color:#2a2960;display:flex;align-items:center;justify-content:center;}
+#roesan-extras .rs-roesan-cta .badge svg{width:22px;height:22px;}
+#roesan-extras .rs-roesan-cta .txt strong{display:block;color:#fff;font-size:15px;margin-bottom:3px;}
+#roesan-extras .rs-roesan-cta .txt span{color:rgba(255,255,255,.75);font-size:13px;line-height:1.5;}
+#roesan-extras .rs-cross{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+#roesan-extras .rs-cross-card{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:3/4;cursor:pointer;transition:all .4s;display:block;text-decoration:none;background:#cbd5e1;}
+#roesan-extras .rs-cross-card:hover{transform:translateY(-6px);box-shadow:0 20px 44px rgba(15,23,42,.18);}
+#roesan-extras .rs-cross-card .ovl{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.85) 0%,rgba(15,23,42,.45) 40%,transparent 100%);}
+#roesan-extras .rs-cross-card .info{position:absolute;bottom:0;left:0;right:0;padding:22px;color:#fff;z-index:2;}
+#roesan-extras .rs-cross-card .accent{width:30px;height:3px;background:#89d4f0;margin-bottom:10px;transition:width .4s;border-radius:2px;}
+#roesan-extras .rs-cross-card:hover .accent{width:52px;}
+#roesan-extras .rs-cross-card h4{font-family:'Philosopher',Georgia,serif;font-weight:500;font-size:20px;margin:0 0 4px;color:#fff;}
+#roesan-extras .rs-cross-card p{font-size:12px;color:rgba(255,255,255,.82);margin:0;line-height:1.4;}
+#roesan-extras .rs-cross-card .cta{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:600;color:#a8e1f3;text-transform:uppercase;letter-spacing:.1em;}
+#roesan-extras .rs-footer{background:#1e103c;color:rgba(255,255,255,.7);padding:56px 0 28px;}
+#roesan-extras .rs-footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:44px;margin-bottom:36px;}
+#roesan-extras .rs-footer h5{color:#fff;font-size:12px;text-transform:uppercase;letter-spacing:.15em;margin:0 0 16px;font-weight:700;}
+#roesan-extras .rs-footer .brand-name{font-family:'Philosopher',Georgia,serif;font-size:26px;font-weight:500;color:#fff;margin-bottom:10px;}
+#roesan-extras .rs-footer p{font-size:13px;line-height:1.6;max-width:320px;color:rgba(255,255,255,.60);margin:0;}
+#roesan-extras .rs-footer ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;}
+#roesan-extras .rs-footer li{font-size:13px;color:rgba(255,255,255,.68);display:flex;align-items:center;gap:9px;}
+#roesan-extras .rs-footer li svg{width:13px;height:13px;color:#89d4f0;flex-shrink:0;}
+#roesan-extras .rs-footer-bottom{padding-top:22px;border-top:1px solid rgba(255,255,255,.10);font-size:11px;color:rgba(255,255,255,.45);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+@media(max-width:900px){
+  #roesan-extras .rs-section{padding:52px 0;}
+  #roesan-extras .rs-assist,#roesan-extras .rs-cross{grid-template-columns:repeat(2,1fr);}
+  #roesan-extras .rs-stepper{grid-template-columns:1fr;}
+  #roesan-extras .rs-stepper-wrap{padding:32px 22px;}
+  #roesan-extras .rs-footer-grid{grid-template-columns:1fr;}
+}
+@media(max-width:480px){
+  #roesan-extras .rs-assist,#roesan-extras .rs-cross{grid-template-columns:1fr;}
+}
+</style>
+
+<!-- ASISTENCIAS -->
+<section class="rs-section" style="background:#f8fafc;">
+  <div class="rs-container">
+    <div class="rs-section-head">
+      <span class="rs-eyebrow">Beneficios incluidos en tu póliza</span>
+      <h2 class="rs-h2">Asistencias 24/7, todo el año</h2>
+      <p class="rs-lead">No solo cubrimos el siniestro grande. La aseguradora seleccionada te respalda también en los días normales: el pinchazo, la batería, la llave perdida.</p>
+    </div>
+    <div class="rs-assist">
+      <div class="rs-assist-card"><span class="num">01</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></div><h4>Grúa ilimitada</h4><p>Sin límite de kilómetros en cualquier carretera del país.</p></div>
+      <div class="rs-assist-card"><span class="num">02</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><h4>Mecánico en sitio</h4><p>Pinchazos, batería descargada, llave dentro del carro.</p></div>
+      <div class="rs-assist-card"><span class="num">03</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg></div><h4>Conductor elegido</h4><p>Si te excediste en una reunión, llevamos tu carro y a ti a casa.</p></div>
+      <div class="rs-assist-card"><span class="num">04</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><h4>Hospedaje y traslado</h4><p>Si te varas lejos de casa, cubrimos hotel y transporte.</p></div>
+      <div class="rs-assist-card"><span class="num">05</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h4>GPS y rastreo</h4><p>Localización inmediata en caso de hurto o emergencia.</p></div>
+      <div class="rs-assist-card"><span class="num">06</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div><h4>Adelanto de fianza</h4><p>Para liberar el vehículo si quedó retenido por la autoridad.</p></div>
+      <div class="rs-assist-card"><span class="num">07</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><h4>Línea jurídica</h4><p>Abogado disponible 24/7 para orientarte en el siniestro.</p></div>
+      <div class="rs-assist-card"><span class="num">08</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg></div><h4>Lavado y laminado</h4><p>Beneficios anuales en talleres autorizados de la red.</p></div>
+    </div>
+    <div class="rs-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div><strong>Estas asistencias las presta la aseguradora que selecciones</strong>, no Roesan. Las coberturas exactas, topes y condiciones dependen de la póliza emitida. Te recomendamos siempre <strong>informarnos también a nosotros</strong> para hacer el acompañamiento y agilizar con la aseguradora cualquier trámite que necesites.</div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPPER SINIESTRO -->
+<section class="rs-section">
+  <div class="rs-container">
+    <div class="rs-stepper-wrap">
+      <div class="rs-stepper-inner">
+        <div class="rs-stepper-head">
+          <span class="rs-eyebrow on-dark">Si pasa algo</span>
+          <h2 class="rs-h2 on-dark" style="margin-top:10px;">Un siniestro <em>resuelto sin estrés</em></h2>
+          <p>El proceso de siniestro se gestiona directamente con la aseguradora, pero tú no estás solo: avísanos a Roesan y nosotros te acompañamos en cada paso.</p>
+        </div>
+        <div class="rs-stepper">
+          <div class="rs-step-list" id="rs-step-list"></div>
+          <div class="rs-step-detail" id="rs-step-detail"></div>
+        </div>
+        <div class="rs-roesan-cta">
+          <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.5 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <div class="txt">
+            <strong>Cuéntanos también a Roesan, no solo a la aseguradora</strong>
+            <span>Cuando reportes el siniestro a tu aseguradora, avísanos a Roesan al mismo tiempo. Hacemos el acompañamiento completo, agilizamos los trámites con la compañía y nos aseguramos de que te respondan como se debe — sin que tú tengas que pelear nada.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CROSS-SELL -->
+<section class="rs-section" style="background:#f8fafc;">
+  <div class="rs-container">
+    <div class="rs-section-head">
+      <span class="rs-eyebrow">Más que tu carro</span>
+      <h2 class="rs-h2">Tu vida tiene <em>más cosas que proteger</em></h2>
+      <p class="rs-lead">Cuando un asesor Roesan conoce tu realidad completa, puede armarte un plan de protección coherente. Pregúntanos por estos seguros en tu próxima cita.</p>
+    </div>
+    <div class="rs-cross">
+      <a class="rs-cross-card" href="https://wa.me/573197282277" target="_blank"><div class="ovl"></div><div class="info"><div class="accent"></div><h4>Seguro de Vida</h4><p>Tranquilidad para los tuyos cuando más lo necesitan.</p><span class="cta">Conocer más →</span></div></a>
+      <a class="rs-cross-card" href="https://wa.me/573197282277" target="_blank"><div class="ovl"></div><div class="info"><div class="accent"></div><h4>Hogar</h4><p>Protege tu casa contra incendio, robo y desastres.</p><span class="cta">Conocer más →</span></div></a>
+      <a class="rs-cross-card" href="https://wa.me/573197282277" target="_blank"><div class="ovl"></div><div class="info"><div class="accent"></div><h4>Salud</h4><p>Plan complementario para ti y tu familia.</p><span class="cta">Conocer más →</span></div></a>
+      <a class="rs-cross-card" href="https://wa.me/573197282277" target="_blank"><div class="ovl"></div><div class="info"><div class="accent"></div><h4>Mascotas</h4><p>Cuidado veterinario para tu mejor amigo.</p><span class="cta">Conocer más →</span></div></a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="rs-footer">
+  <div class="rs-container">
+    <div class="rs-footer-grid">
+      <div>
+        <div class="brand-name">Roesan Seguros</div>
+        <p>Más de 40 años protegiendo el patrimonio de familias y empresas en Colombia. Asesoría personalizada con las mejores aseguradoras del país.</p>
+      </div>
+      <div>
+        <h5>Contacto</h5>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>(601) 745 4838</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>autos@roesan.com</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Calle 109 #19-36 of. 203, Bogotá</li>
+        </ul>
+      </div>
+      <div>
+        <h5>Horario asesores</h5>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Lun – Vie: 8:00 a.m. – 6:00 p.m.</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Sáb: 9:00 a.m. – 1:00 p.m.</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.5 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>Acompañamiento en siniestros</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rs-footer-bottom">
+      <span>© 2026 ORGANIZACIÓN DE SEGUROS ROESAN LTDA</span>
+      <span>Propuesta no vinculante · sujeta a estudio de la aseguradora</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var STEPS=[
+    {num:1,label:'Llámanos',title:'Llámanos al instante',desc:'En el lugar del siniestro, llama primero a la línea 24/7 de la aseguradora y luego avísanos a Roesan. Nosotros entramos a hacer el acompañamiento desde ese momento: validamos tu póliza, te orientamos sobre qué decir y activamos la red de ayuda.',action:'Línea Roesan: (601) 745 4838',icon:'phone'},
+    {num:2,label:'Documenta',title:'Documenta sin riesgos',desc:'Toma fotos del vehículo, los daños y la placa del otro involucrado. Si hay heridos, prioriza atender. Te enviamos un checklist por WhatsApp con qué fotografiar y qué evitar decir mientras llega la grúa o el inspector.',action:'Te enviamos checklist por WhatsApp',icon:'camera'},
+    {num:3,label:'Inspección',title:'Inspección y peritaje',desc:'La aseguradora envía un perito al lugar o coordina cita en taller. Roesan está presente o asiste el peritaje para asegurar que valoren correctamente todos los daños, incluyendo los que no son evidentes a simple vista.',action:'Acompañamos el peritaje',icon:'file'},
+    {num:4,label:'Reparación',title:'Reparación o reposición',desc:'Tu carro entra a un taller autorizado según la red de la aseguradora. Si tu póliza incluye vehículo de reemplazo, te lo entregan mientras tanto. En caso de pérdida total, agilizamos el pago de la indemnización.',action:'Agilizamos plazos con la compañía',icon:'tool'},
+    {num:5,label:'Cierre',title:'Cierre y entrega',desc:'Recibes tu vehículo reparado o la indemnización. Roesan hace seguimiento posterior para verificar la calidad del servicio y resolver cualquier inconformidad. Si algo no quedó bien con la aseguradora, lo retomamos por ti.',action:'Garantía de acompañamiento Roesan',icon:'check'}
+  ];
+  var ICONS={phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',file:'<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/>',tool:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',check:'<polyline points="20 6 9 17 4 12"/>'};
+  var active=0;
+  var list=document.getElementById('rs-step-list'),detail=document.getElementById('rs-step-detail');
+  if(!list||!detail)return;
+  function render(){
+    list.innerHTML=STEPS.map(function(s,i){
+      return '<button class="rs-step-item '+(i===active?'active':(i<active?'done':''))+'" data-i="'+i+'">'
+        +'<span class="num">'+(i<active?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="20 6 9 17 4 12"/><\/svg>':s.num)+'<\/span>'
+        +'<span class="label">'+s.label+'<\/span><\/button>';
+    }).join('');
+    var s=STEPS[active];
+    detail.innerHTML='<div><div class="step-num">0'+s.num+'<\/div><h3>'+s.title+'<\/h3><p>'+s.desc+'<\/p>'
+      +'<div class="rs-step-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px">'+ICONS[s.icon]+'<\/svg>'+s.action+'<\/div><\/div>'
+      +'<div class="rs-step-progress">'+STEPS.map(function(_,i){return '<span class="dot '+(i<=active?'active':'')+'"><\/span>';}).join('')+'<\/div>';
+    list.querySelectorAll('.rs-step-item').forEach(function(b){
+      b.addEventListener('click',function(){active=+this.dataset.i;render();reset();});
+    });
+  }
+  var timer;
+  function reset(){clearInterval(timer);timer=setInterval(function(){active=(active+1)%STEPS.length;render();},6500);}
+  render();reset();
+})();
+<\/script>
+
+</section>
 
 <script>
 window.addEventListener('scroll',()=>{
