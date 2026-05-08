@@ -225,7 +225,7 @@ textarea:focus{border-color:#51408d;background:#fff}
 if(location.hash.startsWith('#propuesta=')||new URLSearchParams(location.search).get('p')){document.body.style.visibility='hidden';}
 
 // ── Estado ────────────────────────────────────────────────────────
-let STATE = {phase:'upload', extracted:null, analysis:null, html:null, beneficios:null};
+let STATE = {phase:'upload', extracted:null, analysis:null, html:null, beneficios:null, polizaPdf:null};
 
 // ── Formato moneda COP ────────────────────────────────────────────
 function fmtCOP(n){
@@ -364,7 +364,7 @@ DATOS: ${JSON.stringify(extracted)}`}],'Eres experto en seguros de vehículos co
     addLog(`Recomendación: ${analysis.recomendada} — ${analysis.plan_recomendado}`,'ok');
     setProgress(90);
     addLog('Generando presentación…');
-    STATE.html=buildHTML(extracted,analysis,STATE.beneficios);
+    STATE.html=buildHTML(extracted,analysis,STATE.beneficios,STATE.polizaPdf);
     addLog('¡Listo!','ok');
     setProgress(100);
     setTimeout(()=>renderDone(extracted,analysis),600);
@@ -429,7 +429,7 @@ function guardarEdicion(){
   STATE.analysis.plan_recomendado=document.getElementById('editPlan').value;
   STATE.analysis.razon_principal=document.getElementById('editRazon').value;
   STATE.analysis.analisis_general=document.getElementById('editAnalisis').value;
-  STATE.html=buildHTML(STATE.extracted,STATE.analysis,STATE.beneficios);
+  STATE.html=buildHTML(STATE.extracted,STATE.analysis,STATE.beneficios,STATE.polizaPdf);
   renderRecView(STATE.analysis);
   cancelarEdicion();
 }
@@ -472,7 +472,7 @@ Responde ÚNICAMENTE con JSON sin markdown:
 
 DATOS: ${JSON.stringify(STATE.extracted)}`}],'Eres experto en seguros de vehículos colombianos. Responde SOLO con JSON válido.');
     STATE.analysis=analysis;
-    STATE.html=buildHTML(STATE.extracted,analysis,STATE.beneficios);
+    STATE.html=buildHTML(STATE.extracted,analysis,STATE.beneficios,STATE.polizaPdf);
     renderRecView(analysis);
     renderQuotes(STATE.extracted,analysis);
   }catch(e){alert('Error regenerando: '+e.message);}
@@ -512,7 +512,7 @@ async function compartirEnlace(){
   try{
     const res=await fetch('/.netlify/functions/propuesta',{
       method:'POST',
-      body:JSON.stringify({extracted:STATE.extracted,analysis:STATE.analysis,beneficios:STATE.beneficios})
+      body:JSON.stringify({extracted:STATE.extracted,analysis:STATE.analysis,beneficios:STATE.beneficios,polizaPdf:STATE.polizaPdf})
     });
     if(!res.ok)throw new Error();
     const {id}=await res.json();
@@ -532,7 +532,7 @@ function showToast(msg){
 }
 
 // ── Reset ─────────────────────────────────────────────────────────
-function reset(){STATE={phase:'upload',extracted:null,analysis:null,html:null,beneficios:null};show('upload');}
+function reset(){STATE={phase:'upload',extracted:null,analysis:null,html:null,beneficios:null,polizaPdf:null};show('upload');}
 function showError(msg){document.getElementById('errMsg').textContent=msg;show('error');}
 
 // ── Icono beneficio ────────────────────────────────────────────────
@@ -560,6 +560,7 @@ async function procesarPolizaRecomendada(file){
   document.getElementById('polizaOk').style.display='none';
   try{
     const b64=await readBase64(file);
+    STATE.polizaPdf=b64;
     const result=await callClaude([{role:'user',content:[
       {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
       {type:'text',text:`Analiza este PDF de póliza de seguro de auto colombiano y extrae los beneficios, coberturas y asistencias incluidas.
@@ -568,7 +569,7 @@ Responde ÚNICAMENTE con JSON válido sin markdown:
 Máximo 8 beneficios más relevantes para el asegurado. Descripciones de máximo 12 palabras cada una.`}
     ]}],'Eres experto en seguros colombianos. Responde SOLO con JSON válido.');
     STATE.beneficios=result.beneficios||[];
-    STATE.html=buildHTML(STATE.extracted,STATE.analysis,STATE.beneficios);
+    STATE.html=buildHTML(STATE.extracted,STATE.analysis,STATE.beneficios,STATE.polizaPdf);
     const msg=`${result.beneficios?.length||0} beneficios extraídos — ${result.aseguradora||'póliza procesada'}`;
     document.getElementById('polizaOkMsg').textContent=msg;
     document.getElementById('polizaSpinner').style.display='none';
@@ -581,6 +582,7 @@ Máximo 8 beneficios más relevantes para el asegurado. Descripciones de máximo
 }
 function resetPoliza(){
   STATE.beneficios=null;
+  STATE.polizaPdf=null;
   STATE.html=buildHTML(STATE.extracted,STATE.analysis);
   document.getElementById('polizaInput').value='';
   document.getElementById('polizaOk').style.display='none';
@@ -588,7 +590,7 @@ function resetPoliza(){
 }
 
 // ── Builder HTML final ────────────────────────────────────────────
-function buildHTML(ext,an,beneficios){
+function buildHTML(ext,an,beneficios,polizaPdf){
   const rec=ext.cotizaciones.find(c=>c.aseguradora.toLowerCase().includes(an.recomendada.toLowerCase()))||ext.cotizaciones[0];
   const sorted=[...ext.cotizaciones].sort((a,b)=>a.prima_anual-b.prima_anual);
   const minP=sorted[0].prima_anual,maxP=sorted[sorted.length-1].prima_anual;
@@ -617,11 +619,12 @@ function buildHTML(ext,an,beneficios){
           <div><div style="color:#94a3b8;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Reemplazo</div><div style="color:#1e293b;font-weight:600">${q.reemplazo_total}</div></div>
           <div><div style="color:#94a3b8;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Cond. elegido</div><div style="color:#1e293b;font-weight:600">${q.conductor_elegido}</div></div>
         </div>
-        <div>
+        <div style="display:flex;flex-direction:column;gap:7px;align-items:flex-start">
           <a class="qbtn" href="https://wa.me/573197282277?text=${waMsg}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9999px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:12px;white-space:nowrap;box-shadow:0 3px 10px rgba(37,211,102,0.3)">
             <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.553 4.103 1.523 5.824L.057 23.428a.75.75 0 0 0 .915.915l5.604-1.466A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.732 9.732 0 0 1-4.964-1.355l-.356-.212-3.679.963.981-3.587-.232-.369A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
             Seleccionar esta póliza
           </a>
+          ${isRec&&polizaPdf?`<a href="data:application/pdf;base64,${polizaPdf}" download="propuesta-${q.aseguradora.replace(/\s+/g,'-')}.pdf" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9999px;background:#f1f5f9;color:#334155;text-decoration:none;font-weight:700;font-size:12px;white-space:nowrap;border:1px solid #e2e8f0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>Ver PDF póliza</a>`:''}
         </div>
       </div>
     </div>`;
@@ -1042,8 +1045,8 @@ window.addEventListener('scroll',()=>{
 }
 
 // ── Abrir propuesta desde enlace compartido ───────────────────────
-function _mostrarPropuesta(extracted,analysis,beneficios){
-  const html=buildHTML(extracted,analysis,beneficios);
+function _mostrarPropuesta(extracted,analysis,beneficios,polizaPdf){
+  const html=buildHTML(extracted,analysis,beneficios,polizaPdf);
   const blob=new Blob([html],{type:'text/html'});
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#fff';
@@ -1060,7 +1063,7 @@ function _mostrarPropuesta(extracted,analysis,beneficios){
   if(pid){
     fetch('/.netlify/functions/propuesta?id='+encodeURIComponent(pid))
       .then(r=>r.ok?r.json():Promise.reject())
-      .then(d=>{if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis,d.beneficios);})
+      .then(d=>{if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis,d.beneficios,d.polizaPdf);})
       .catch(()=>{document.body.style.visibility='visible';});
     return;
   }
@@ -1069,7 +1072,7 @@ function _mostrarPropuesta(extracted,analysis,beneficios){
   if(!h.startsWith('#propuesta='))return;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(h.slice(11)))));
-    if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis,d.beneficios);
+    if(d.extracted&&d.analysis)_mostrarPropuesta(d.extracted,d.analysis,d.beneficios,d.polizaPdf);
   }catch(e){console.error('Enlace inválido',e);}
 })();
 
