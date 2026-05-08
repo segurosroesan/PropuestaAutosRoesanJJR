@@ -997,7 +997,7 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
 <script>
 (function(){
   var STEPS=[
-    {num:1,label:'Llámanos',title:'Llámanos al instante',desc:'En el lugar del siniestro, llama primero a la línea 24/7 de la aseguradora y luego avísanos a Roesan. Nosotros entramos a hacer el acompañamiento desde ese momento: validamos tu póliza, te orientamos sobre qué decir y activamos la red de ayuda.',action:'Línea Roesan: (601) 745 4838',icon:'phone'},
+    {num:1,label:'Llámanos',title:'Llámanos al instante',desc:'En el lugar del siniestro, llama primero a la línea 24/7 de la aseguradora y luego notifica a Roesan. Nosotros entramos a hacer el acompañamiento desde ese momento: validamos tu póliza, te orientamos sobre qué decir y activamos la red de ayuda.',action:'',icon:'phone'},
     {num:2,label:'Documenta',title:'Documenta sin riesgos',desc:'Toma fotos del vehículo, los daños y la placa del otro involucrado. Si hay heridos, prioriza atender. Te enviamos un checklist por WhatsApp con qué fotografiar y qué evitar decir mientras llega la grúa o el inspector.',action:'Te enviamos checklist por WhatsApp',icon:'camera'},
     {num:3,label:'Inspección',title:'Inspección y peritaje',desc:'La aseguradora envía un perito al lugar o coordina cita en taller. Roesan está presente o asiste el peritaje para asegurar que valoren correctamente todos los daños, incluyendo los que no son evidentes a simple vista.',action:'Acompañamos el peritaje',icon:'file'},
     {num:4,label:'Reparación',title:'Reparación o reposición',desc:'Tu carro entra a un taller autorizado según la red de la aseguradora. Si tu póliza incluye vehículo de reemplazo, te lo entregan mientras tanto. En caso de pérdida total, agilizamos el pago de la indemnización.',action:'Agilizamos plazos con la compañía',icon:'tool'},
@@ -1015,7 +1015,7 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
     }).join('');
     var s=STEPS[active];
     detail.innerHTML='<div><div class="step-num">0'+s.num+'<\/div><h3>'+s.title+'<\/h3><p>'+s.desc+'<\/p>'
-      +'<div class="rs-step-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px">'+ICONS[s.icon]+'<\/svg>'+s.action+'<\/div><\/div>'
+      +(s.action?'<div class="rs-step-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px">'+ICONS[s.icon]+'<\/svg>'+s.action+'<\/div>':'')+'<\/div>'
       +'<div class="rs-step-progress">'+STEPS.map(function(_,i){return '<span class="dot '+(i<=active?'active':'')+'"><\/span>';}).join('')+'<\/div>';
     list.querySelectorAll('.rs-step-item').forEach(function(b){
       b.addEventListener('click',function(){active=+this.dataset.i;render();reset();});
