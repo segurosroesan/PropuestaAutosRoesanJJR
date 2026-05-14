@@ -83,6 +83,9 @@ textarea:focus{border-color:#51408d;background:#fff}
         <div style="font-size:14px;color:#64748b">o haz clic para seleccionar · solo archivos .pdf</div>
         <input type="file" id="fileInput" accept=".pdf" style="display:none" onchange="onFileSelect(event)"/>
       </div>
+      <div style="text-align:center;margin-top:14px">
+        <button onclick="loadDemo()" style="background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;text-decoration:underline;padding:4px 8px">Vista demo (sin PDF)</button>
+      </div>
     </div>
   </div>
 
@@ -533,6 +536,37 @@ function showToast(msg){
 
 // ── Reset ─────────────────────────────────────────────────────────
 function reset(){STATE={phase:'upload',extracted:null,analysis:null,html:null,beneficios:null,polizaPdf:null};show('upload');}
+
+function loadDemo(){
+  const ext={
+    cliente:{nombre:'CARLOS ANDRÉS MORENO VARGAS',cedula:'79.543.217',edad:'38',genero:'M'},
+    vehiculo:{marca:'Toyota',linea:'Corolla Cross XEI',modelo:'2023',placa:'UKT-392',ciudad:'Bogotá',valor:'$128.000.000'},
+    asesor:{nombre:'Adriana Garzón',telefono:'3197282277',email:'autos@roesan.com'},
+    cotizaciones:[
+      {aseguradora:'Bolívar',plan:'Premium',prima_anual:3240000,rc_limite:'300 SMMLV',ded_daño:'0.8 SMMLV',ded_hurto:'0.8 SMMLV',ded_naturaleza:'0.8 SMMLV',reemplazo_total:'30 días',reemplazo_parcial:'15 días',conductor_elegido:'Incluido',indemnizacion:'Valor comercial',grua:'Ilimitada',carrotaller:'Incluido'},
+      {aseguradora:'AXA Colpatria',plan:'Plus Asis. Plus',prima_anual:3410000,rc_limite:'300 SMMLV',ded_daño:'1 SMMLV',ded_hurto:'1 SMMLV',ded_naturaleza:'1 SMMLV',reemplazo_total:'15 días',reemplazo_parcial:'No',conductor_elegido:'Incluido',indemnizacion:'Valor comercial',grua:'Ilimitada',carrotaller:'Incluido'},
+      {aseguradora:'Allianz',plan:'Autos Plus',prima_anual:3870000,rc_limite:'400 SMMLV',ded_daño:'1 SMMLV',ded_hurto:'1 SMMLV',ded_naturaleza:'1 SMMLV',reemplazo_total:'No',reemplazo_parcial:'No',conductor_elegido:'Incluido',indemnizacion:'Valor real',grua:'Ilimitada',carrotaller:'No'},
+      {aseguradora:'Zurich',plan:'MEDIUM',prima_anual:3895000,rc_limite:'250 SMMLV',ded_daño:'1 SMMLV',ded_hurto:'1 SMMLV',ded_naturaleza:'1 SMMLV',reemplazo_total:'No',reemplazo_parcial:'No',conductor_elegido:'No',indemnizacion:'Valor real',grua:'300 km',carrotaller:'No'},
+      {aseguradora:'Previsora',plan:'Au.Ded.Unic',prima_anual:3920000,rc_limite:'300 SMMLV',ded_daño:'1 SMMLV',ded_hurto:'1 SMMLV',ded_naturaleza:'1 SMMLV',reemplazo_total:'No',reemplazo_parcial:'No',conductor_elegido:'Incluido',indemnizacion:'Valor comercial',grua:'Ilimitada',carrotaller:'Incluido'},
+      {aseguradora:'HDI Seguros',plan:'Total CAR',prima_anual:4100000,rc_limite:'500 SMMLV',ded_daño:'1 SMMLV',ded_hurto:'1 SMMLV',ded_naturaleza:'1 SMMLV',reemplazo_total:'20 días',reemplazo_parcial:'No',conductor_elegido:'Incluido',indemnizacion:'Valor comercial',grua:'Ilimitada',carrotaller:'Incluido'},
+      {aseguradora:'Mapfre',plan:'Super Trébol',prima_anual:4380000,rc_limite:'300 SMMLV',ded_daño:'1 SMMLV',ded_hurto:'1 SMMLV',ded_naturaleza:'1 SMMLV',reemplazo_total:'15 días',reemplazo_parcial:'No',conductor_elegido:'Incluido',indemnizacion:'Valor comercial',grua:'Ilimitada',carrotaller:'Incluido'}
+    ]
+  };
+  const an={
+    recomendada:'Bolívar',
+    plan_recomendado:'Premium',
+    analisis_general:'Señor Carlos Andrés, para su Toyota Corolla Cross 2023 valorado en $128.000.000, hemos analizado 7 propuestas del mercado. Bolívar Premium destaca como la opción más equilibrada: combina la prima más baja con deducibles reducidos y el mejor programa de vehículo de reemplazo en caso de pérdida total. Los deducibles de solo 0.8 SMMLV representan una ventaja tangible que se traduce en menor desembolso tanto mensual como en el momento de un eventual siniestro.',
+    razon_principal:'Ofrece la prima más competitiva del mercado ($3.240.000) con deducibles significativamente más bajos (0.8 SMMLV vs 1 SMMLV de la competencia) y el mejor beneficio de vehículo de reemplazo del comparativo (hasta 30 días por pérdida total).',
+    puntos_fuertes:['Prima más baja del comparativo','Deducible 0.8 SMMLV — el más bajo','Vehículo de reemplazo hasta 30 días','Hurto total y parcial incluido'],
+    alternativa:'AXA Colpatria',
+    razon_alternativa:'Segunda opción más económica con buenas coberturas, aunque con deducible mayor y solo 15 días de vehículo de reemplazo.'
+  };
+  STATE.extracted=ext;
+  STATE.analysis=an;
+  STATE.html=buildHTML(ext,an,null,null);
+  renderQuotes(ext,an);
+  show('done');
+}
 function showError(msg){document.getElementById('errMsg').textContent=msg;show('error');}
 
 // ── Icono beneficio ────────────────────────────────────────────────
@@ -730,24 +764,6 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
 </div>
 </div></div>
 
-<!-- ASISTENCIAS -->
-<section class="rs-section" style="background:#f8fafc;">
-  <div class="rs-container">
-    <div class="rs-section-head">
-      <span class="rs-eyebrow">Beneficios incluidos en tu póliza</span>
-      <h2 class="rs-h2">Asistencias 24/7, todo el año</h2>
-      <p class="rs-lead">No solo cubrimos el siniestro grande. La aseguradora seleccionada te respalda también en los días normales: el pinchazo, la batería, la llave perdida.</p>
-    </div>
-    <div class="rs-assist">
-      ${beneficiosHtml}
-    </div>
-    <div class="rs-note">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <div><strong>Estas asistencias las presta la aseguradora que selecciones</strong>, no Roesan. Las coberturas exactas, topes y condiciones dependen de la póliza emitida. Te recomendamos siempre <strong>informarnos también a nosotros</strong> para hacer el acompañamiento y agilizar con la aseguradora cualquier trámite que necesites.</div>
-    </div>
-  </div>
-</section>
-
 <div class="section"><div class="container">
   <span class="eyebrow">Tu vehículo</span>
   <h2>Lo que vamos a <em>proteger</em></h2>
@@ -779,6 +795,24 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
     <div style="background:rgba(253,223,69,.08);border:1px solid rgba(253,223,69,.3);border-radius:16px;padding:18px;font-size:13px;color:rgba(255,255,255,.85);line-height:1.55"><strong style="color:#fde68a">⚠ Importante:</strong> En caso de tratarse de una póliza nueva o de un cambio de aseguradora durante un proceso de renovación, la compañía aseguradora podrá solicitar, como requisito previo a la emisión de la póliza, una inspección del riesgo. Adicionalmente, algunas aseguradoras pueden requerir procesos de georreferenciación del vehículo mediante plataformas especializadas, como Cazador, según sus políticas de suscripción.</div>
   </div>
 </div></div>
+
+<!-- ASISTENCIAS -->
+<section class="rs-section" style="background:#f8fafc;">
+  <div class="rs-container">
+    <div class="rs-section-head">
+      <span class="rs-eyebrow">Beneficios incluidos en tu póliza</span>
+      <h2 class="rs-h2">Asistencias 24/7, todo el año</h2>
+      <p class="rs-lead">No solo cubrimos el siniestro grande. La aseguradora seleccionada te respalda también en los días normales: el pinchazo, la batería, la llave perdida.</p>
+    </div>
+    <div class="rs-assist">
+      ${beneficiosHtml}
+    </div>
+    <div class="rs-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div><strong>Estas asistencias las presta la aseguradora que selecciones</strong>, no Roesan. Las coberturas exactas, topes y condiciones dependen de la póliza emitida. Te recomendamos siempre <strong>informarnos también a nosotros</strong> para hacer el acompañamiento y agilizar con la aseguradora cualquier trámite que necesites.</div>
+    </div>
+  </div>
+</section>
 
 <div class="section"><div class="container">
   <span class="eyebrow">${ext.cotizaciones.length} aseguradoras comparadas</span>
