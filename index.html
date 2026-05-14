@@ -48,6 +48,7 @@ textarea:focus{border-color:#51408d;background:#fff}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1e103c;color:#fff;padding:13px 28px;border-radius:14px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.25)}
 .toast.show{opacity:1}
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -79,9 +80,9 @@ textarea:focus{border-color:#51408d;background:#fff}
           <polyline points="14 2 14 8 20 8"/>
           <line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/>
         </svg>
-        <div style="font-size:17px;font-weight:600;color:#334155;margin-bottom:6px">Arrastra el PDF aquí</div>
-        <div style="font-size:14px;color:#64748b">o haz clic para seleccionar · solo archivos .pdf</div>
-        <input type="file" id="fileInput" accept=".pdf" style="display:none" onchange="onFileSelect(event)"/>
+        <div style="font-size:17px;font-weight:600;color:#334155;margin-bottom:6px">Arrastra el archivo aquí</div>
+        <div style="font-size:14px;color:#64748b">o haz clic para seleccionar · PDF o Excel (.xlsx / .xls)</div>
+        <input type="file" id="fileInput" accept=".pdf,.xlsx,.xls" style="display:none" onchange="onFileSelect(event)"/>
       </div>
       <div style="text-align:center;margin-top:14px">
         <button onclick="loadDemo()" style="background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;text-decoration:underline;padding:4px 8px">Vista demo (sin PDF)</button>
@@ -327,30 +328,47 @@ function readBase64(file){
   return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=()=>rej(new Error('Error leyendo archivo'));r.readAsDataURL(file);});
 }
 
-// ── Procesar PDF ──────────────────────────────────────────────────
+// ── Procesar archivo (PDF o Excel) ───────────────────────────────
+function isExcel(file){return !!(file.name.match(/\.xlsx?$/i)||file.type.includes('spreadsheet')||file.type.includes('excel'));}
+
+function readExcelAsText(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      try{
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+        const lines=[];
+        wb.SheetNames.forEach(name=>{
+          lines.push('=== Hoja: '+name+' ===');
+          lines.push(XLSX.utils.sheet_to_csv(wb.Sheets[name]));
+        });
+        res(lines.join('\n'));
+      }catch(err){rej(err);}
+    };
+    r.onerror=()=>rej(new Error('Error leyendo Excel'));
+    r.readAsArrayBuffer(file);
+  });
+}
+
 async function processFile(file){
-  if(!file||file.type!=='application/pdf'){showError('Por favor sube un archivo .pdf válido.');return;}
+  const excel=isExcel(file);
+  if(!file||(!excel&&file.type!=='application/pdf')){showError('Por favor sube un archivo PDF o Excel (.xlsx/.xls) válido.');return;}
   show('processing');
   document.getElementById('logContainer').innerHTML='';
   setProgress(0);
   try{
-    addLog('Leyendo PDF…');
-    const b64=await readBase64(file);
+    addLog(excel?'Leyendo Excel…':'Leyendo PDF…');
+    let msgContent;
+    if(excel){
+      const txt=await readExcelAsText(file);
+      msgContent=[{type:'text',text:`Analiza esta cotización de seguros de autos colombianos (archivo Excel convertido a texto):\n\n${txt}\n\nResponde ÚNICAMENTE con JSON válido sin markdown:\n{\n  "folio":"",\n  "vigencia_oferta":"",\n  "cliente":{"nombre":"","cedula":"","edad":0,"genero":""},\n  "vehiculo":{"marca":"","linea":"","año":"","placa":"","ciudad":"","uso":"","valor_asegurado":""},\n  "asesor":{"nombre":"","email":"","telefono":""},\n  "cotizaciones":[{"aseguradora":"","plan":"","prima_anual":0,"rc_limite":"","ded_daño":"","ded_hurto":"","ded_naturaleza":"","reemplazo_total":"","reemplazo_parcial":"","conductor_elegido":"","indemnizacion":"","grua":"","carrotaller":""}]\n}`}];
+    }else{
+      const b64=await readBase64(file);
+      msgContent=[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:`Analiza este PDF de cotización de seguros de autos colombianos.\nResponde ÚNICAMENTE con JSON válido sin markdown:\n{\n  "folio":"",\n  "vigencia_oferta":"",\n  "cliente":{"nombre":"","cedula":"","edad":0,"genero":""},\n  "vehiculo":{"marca":"","linea":"","año":"","placa":"","ciudad":"","uso":"","valor_asegurado":""},\n  "asesor":{"nombre":"","email":"","telefono":""},\n  "cotizaciones":[{"aseguradora":"","plan":"","prima_anual":0,"rc_limite":"","ded_daño":"","ded_hurto":"","ded_naturaleza":"","reemplazo_total":"","reemplazo_parcial":"","conductor_elegido":"","indemnizacion":"","grua":"","carrotaller":""}]\n}`}];
+    }
     setProgress(15);
     addLog('Extrayendo datos con IA…');
-    const extracted=await callClaude([{role:'user',content:[
-      {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
-      {type:'text',text:`Analiza este PDF de cotización de seguros de autos colombianos.
-Responde ÚNICAMENTE con JSON válido sin markdown:
-{
-  "folio":"",
-  "vigencia_oferta":"",
-  "cliente":{"nombre":"","cedula":"","edad":0,"genero":""},
-  "vehiculo":{"marca":"","linea":"","año":"","placa":"","ciudad":"","uso":"","valor_asegurado":""},
-  "asesor":{"nombre":"","email":"","telefono":""},
-  "cotizaciones":[{"aseguradora":"","plan":"","prima_anual":0,"rc_limite":"","ded_daño":"","ded_hurto":"","ded_naturaleza":"","reemplazo_total":"","reemplazo_parcial":"","conductor_elegido":"","indemnizacion":"","grua":"","carrotaller":""}]
-}`}
-    ]}],'Eres experto en seguros colombianos. Responde SOLO con JSON válido.');
+    const extracted=await callClaude([{role:'user',content:msgContent}],'Eres experto en seguros colombianos. Responde SOLO con JSON válido.');
     STATE.extracted=extracted;
     addLog(`Cliente: ${extracted.cliente.nombre}`,'ok');
     addLog(`Vehículo: ${extracted.vehiculo.marca} ${extracted.vehiculo.año} — ${extracted.cotizaciones.length} aseguradoras`,'ok');
