@@ -135,7 +135,7 @@ textarea:focus{border-color:#51408d;background:#fff}
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" onclick="toggleEditRec()" id="btnEditRec">✏️ Editar</button>
-          <button class="btn btn-purple btn-sm" onclick="regenerarRecomendacion()" id="btnRegen">
+          <button class="btn btn-purple btn-sm" onclick="abrirModalRegen()" id="btnRegen">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
             Regenerar
           </button>
@@ -177,6 +177,22 @@ textarea:focus{border-color:#51408d;background:#fff}
       <!-- Spinner regenerando -->
       <div id="regenSpinner" style="display:none;align-items:center;gap:10px;padding:14px;color:#64748b;font-size:14px">
         <div class="spinner"></div> Regenerando recomendación con IA...
+      </div>
+
+      <!-- Modal instrucción regenerar -->
+      <div id="regenModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
+        <div style="background:#fff;border-radius:20px;padding:28px;max-width:520px;width:100%;box-shadow:0 24px 60px rgba(15,23,42,.22)">
+          <div style="font-size:17px;font-weight:700;color:#0f172a;margin-bottom:6px">¿Qué quieres cambiar?</div>
+          <div style="font-size:13px;color:#64748b;margin-bottom:16px">Explícale a la IA qué ajustar en la recomendación. Puedes indicar qué aseguradora preferir, por qué, o cualquier contexto adicional.</div>
+          <textarea id="regenInstruccion" rows="4" placeholder="Ej: No recomiendes Bolívar. Recomienda AXA Colpatria porque es una renovación y aunque sale un poco más costosa, tiene mayor RC y el cliente ya conoce la aseguradora..." style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #e2e8f0;font-size:14px;font-family:inherit;outline:none;resize:vertical;line-height:1.5;color:#334155"></textarea>
+          <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">
+            <button class="btn btn-ghost btn-sm" onclick="cerrarModalRegen()">Cancelar</button>
+            <button class="btn btn-purple btn-sm" onclick="confirmarRegen()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              Regenerar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -444,14 +460,28 @@ function cancelarEdicion(){
 }
 
 // ── Regenerar recomendación ───────────────────────────────────────
-async function regenerarRecomendacion(){
+function abrirModalRegen(){
+  document.getElementById('regenInstruccion').value='';
+  const modal=document.getElementById('regenModal');
+  modal.style.display='flex';
+  setTimeout(()=>document.getElementById('regenInstruccion').focus(),80);
+}
+function cerrarModalRegen(){
+  document.getElementById('regenModal').style.display='none';
+}
+function confirmarRegen(){
+  const instruccion=document.getElementById('regenInstruccion').value.trim();
+  cerrarModalRegen();
+  regenerarRecomendacion(instruccion);
+}
+async function regenerarRecomendacion(instruccion){
   if(!STATE.extracted)return;
   document.getElementById('recReadView').style.display='none';
   document.getElementById('recEditView').style.display='none';
   document.getElementById('regenSpinner').style.display='flex';
   document.getElementById('btnRegen').disabled=true;
   try{
-    const analysis=await callClaude([{role:'user',content:`Eres asesor senior de Roesan Seguros Colombia. Genera una NUEVA recomendación con enfoque distinto al anterior.
+    const analysis=await callClaude([{role:'user',content:`Eres asesor senior de Roesan Seguros Colombia. Genera una NUEVA recomendación con enfoque distinto al anterior.${instruccion?`\n\nINSTRUCCIÓN DEL ASESOR (debes seguirla): ${instruccion}`:''}
 
 CRITERIOS DE DECISIÓN (ponderación):
 - Precio / prima anual: 35%
