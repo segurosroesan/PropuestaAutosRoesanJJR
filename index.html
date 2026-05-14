@@ -730,6 +730,24 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
 </div>
 </div></div>
 
+<!-- ASISTENCIAS -->
+<section class="rs-section" style="background:#f8fafc;">
+  <div class="rs-container">
+    <div class="rs-section-head">
+      <span class="rs-eyebrow">Beneficios incluidos en tu póliza</span>
+      <h2 class="rs-h2">Asistencias 24/7, todo el año</h2>
+      <p class="rs-lead">No solo cubrimos el siniestro grande. La aseguradora seleccionada te respalda también en los días normales: el pinchazo, la batería, la llave perdida.</p>
+    </div>
+    <div class="rs-assist">
+      ${beneficiosHtml}
+    </div>
+    <div class="rs-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div><strong>Estas asistencias las presta la aseguradora que selecciones</strong>, no Roesan. Las coberturas exactas, topes y condiciones dependen de la póliza emitida. Te recomendamos siempre <strong>informarnos también a nosotros</strong> para hacer el acompañamiento y agilizar con la aseguradora cualquier trámite que necesites.</div>
+    </div>
+  </div>
+</section>
+
 <div class="section"><div class="container">
   <span class="eyebrow">Tu vehículo</span>
   <h2>Lo que vamos a <em>proteger</em></h2>
@@ -821,103 +839,86 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
 
 <section id="roesan-extras" style="--rs-purple:#51408d;--rs-purple-800:#2a2960;--rs-purple-950:#1e103c;--rs-cyan:#61bbe4;--rs-cyan-300:#a8e1f3;--rs-cyan-400:#89d4f0;--rs-yellow:#fddf45;--rs-slate-50:#f8fafc;--rs-slate-100:#f1f5f9;--rs-slate-200:#e2e8f0;--rs-slate-400:#94a3b8;--rs-slate-500:#64748b;--rs-slate-700:#334155;--rs-slate-900:#0f172a;font-family:'Roboto',system-ui,sans-serif;color:#334155;">
 <style>
-#roesan-extras *{box-sizing:border-box;}
-#roesan-extras .rs-container{max-width:1100px;margin:0 auto;padding:0 28px;}
-#roesan-extras .rs-section{padding:80px 0;position:relative;}
-#roesan-extras .rs-eyebrow{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.20em;color:#61bbe4;display:inline-block;margin-bottom:14px;}
-#roesan-extras .rs-eyebrow.on-dark{color:#89d4f0;}
-#roesan-extras .rs-h2{font-family:'Philosopher',Georgia,serif;font-weight:500;font-size:clamp(28px,4vw,46px);margin:0 0 16px;line-height:1.1;letter-spacing:-.015em;color:#0f172a;}
-#roesan-extras .rs-h2 em{font-style:italic;color:#51408d;}
-#roesan-extras .rs-h2.on-dark{color:#fff;}
-#roesan-extras .rs-h2.on-dark em{color:#89d4f0;}
-#roesan-extras .rs-lead{font-size:18px;color:#64748b;line-height:1.55;font-weight:300;margin:0;max-width:620px;}
-#roesan-extras .rs-section-head{max-width:720px;margin-bottom:44px;}
-#roesan-extras .rs-note{margin-top:24px;padding:18px 22px;background:rgba(253,223,69,.10);border:1px solid rgba(253,223,69,.45);border-radius:14px;font-size:14px;color:#334155;line-height:1.55;display:flex;gap:12px;align-items:flex-start;}
-#roesan-extras .rs-assist{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
-#roesan-extras .rs-assist-card{background:#fff;border-radius:20px;padding:28px 24px;border:1px solid rgba(226,232,240,.8);position:relative;overflow:hidden;transition:all .3s ease;}
-#roesan-extras .rs-assist-card:hover{transform:translateY(-5px);box-shadow:0 14px 36px rgba(15,23,42,.10);border-color:#a8e1f3;}
-#roesan-extras .rs-assist-card .ico{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#a8e1f3,#61bbe4);color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 6px 16px rgba(97,187,228,.3);}
-#roesan-extras .rs-assist-card .ico svg{width:22px;height:22px;}
-#roesan-extras .rs-assist-card h4{font-weight:700;font-size:16px;color:#0f172a;margin:0 0 6px;}
-#roesan-extras .rs-assist-card p{font-size:13px;color:#64748b;line-height:1.5;margin:0;}
-#roesan-extras .rs-assist-card .num{position:absolute;top:22px;right:22px;font-family:'Philosopher',Georgia,serif;font-size:13px;color:#e2e8f0;font-weight:700;}
-#roesan-extras .rs-stepper-wrap{background:linear-gradient(135deg,#1e103c 0%,#2a2960 100%);border-radius:28px;padding:52px;color:#fff;position:relative;overflow:hidden;}
-#roesan-extras .rs-stepper-wrap::before{content:"";position:absolute;top:-100px;right:-100px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(97,187,228,.18),transparent 70%);}
-#roesan-extras .rs-stepper-inner{position:relative;z-index:1;}
-#roesan-extras .rs-stepper-head{max-width:580px;margin-bottom:36px;}
-#roesan-extras .rs-stepper-head p{color:rgba(255,255,255,.75);font-size:16px;line-height:1.55;margin:0;}
-#roesan-extras .rs-stepper{display:grid;grid-template-columns:260px 1fr;gap:36px;}
-#roesan-extras .rs-step-list{display:flex;flex-direction:column;gap:5px;}
-#roesan-extras .rs-step-item{display:flex;gap:14px;align-items:flex-start;padding:12px 14px;border-radius:12px;cursor:pointer;transition:all .25s;border:1px solid transparent;background:transparent;text-align:left;width:100%;font-family:'Roboto',sans-serif;color:rgba(255,255,255,.6);}
-#roesan-extras .rs-step-item:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.9);}
-#roesan-extras .rs-step-item.active{background:rgba(97,187,228,.10);color:#fff;border-color:rgba(97,187,228,.28);}
-#roesan-extras .rs-step-item .num{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-family:'Philosopher',Georgia,serif;font-size:13px;font-weight:600;}
-#roesan-extras .rs-step-item.active .num{background:#61bbe4;border-color:#61bbe4;color:#fff;}
-#roesan-extras .rs-step-item.done .num{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.38);color:#4ade80;}
-#roesan-extras .rs-step-item .label{font-size:13px;font-weight:500;padding-top:5px;}
-#roesan-extras .rs-step-detail{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:20px;padding:32px;display:flex;flex-direction:column;justify-content:space-between;min-height:300px;}
-#roesan-extras .rs-step-detail .step-num{font-family:'Philosopher',Georgia,serif;font-size:72px;line-height:1;color:rgba(97,187,228,.25);font-weight:500;margin-bottom:6px;}
-#roesan-extras .rs-step-detail h3{font-family:'Philosopher',Georgia,serif;font-weight:500;font-size:26px;color:#fff;margin:0 0 10px;line-height:1.15;}
-#roesan-extras .rs-step-detail p{font-size:15px;color:rgba(255,255,255,.75);line-height:1.6;margin:0;}
-#roesan-extras .rs-step-action{margin-top:20px;display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:9999px;background:rgba(97,187,228,.14);border:1px solid rgba(97,187,228,.28);color:#a8e1f3;font-size:13px;font-weight:600;width:fit-content;}
-#roesan-extras .rs-step-progress{display:flex;gap:5px;margin-top:20px;}
-#roesan-extras .rs-step-progress .dot{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.10);transition:background .3s;}
-#roesan-extras .rs-step-progress .dot.active{background:#89d4f0;}
-#roesan-extras .rs-roesan-cta{margin-top:28px;padding:22px 26px;background:rgba(253,223,69,.08);border:1px solid rgba(253,223,69,.28);border-radius:18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
-#roesan-extras .rs-roesan-cta .badge{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:#fddf45;color:#2a2960;display:flex;align-items:center;justify-content:center;}
-#roesan-extras .rs-roesan-cta .badge svg{width:22px;height:22px;}
-#roesan-extras .rs-roesan-cta .txt strong{display:block;color:#fff;font-size:15px;margin-bottom:3px;}
-#roesan-extras .rs-roesan-cta .txt span{color:rgba(255,255,255,.75);font-size:13px;line-height:1.5;}
-#roesan-extras .rs-cross{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
-#roesan-extras .rs-cross-card{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:3/4;cursor:pointer;transition:all .4s;display:block;text-decoration:none;background:#cbd5e1;}
-#roesan-extras .rs-cross-card:hover{transform:translateY(-6px);box-shadow:0 20px 44px rgba(15,23,42,.18);}
-#roesan-extras .rs-cross-card .ovl{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.85) 0%,rgba(15,23,42,.45) 40%,transparent 100%);}
-#roesan-extras .rs-cross-card .info{position:absolute;bottom:0;left:0;right:0;padding:22px;color:#fff;z-index:2;}
-#roesan-extras .rs-cross-card .accent{width:30px;height:3px;background:#89d4f0;margin-bottom:10px;transition:width .4s;border-radius:2px;}
-#roesan-extras .rs-cross-card:hover .accent{width:52px;}
-#roesan-extras .rs-cross-card h4{font-family:'Philosopher',Georgia,serif;font-weight:500;font-size:20px;margin:0 0 4px;color:#fff;}
-#roesan-extras .rs-cross-card p{font-size:12px;color:rgba(255,255,255,.82);margin:0;line-height:1.4;}
-#roesan-extras .rs-cross-card .cta{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:600;color:#a8e1f3;text-transform:uppercase;letter-spacing:.1em;}
-#roesan-extras .rs-footer{background:#1e103c;color:rgba(255,255,255,.7);padding:56px 0 28px;}
-#roesan-extras .rs-footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:44px;margin-bottom:36px;}
-#roesan-extras .rs-footer h5{color:#fff;font-size:12px;text-transform:uppercase;letter-spacing:.15em;margin:0 0 16px;font-weight:700;}
-#roesan-extras .rs-footer .brand-name{font-family:'Philosopher',Georgia,serif;font-size:26px;font-weight:500;color:#fff;margin-bottom:10px;}
-#roesan-extras .rs-footer p{font-size:13px;line-height:1.6;max-width:320px;color:rgba(255,255,255,.60);margin:0;}
-#roesan-extras .rs-footer ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;}
-#roesan-extras .rs-footer li{font-size:13px;color:rgba(255,255,255,.68);display:flex;align-items:center;gap:9px;}
-#roesan-extras .rs-footer li svg{width:13px;height:13px;color:#89d4f0;flex-shrink:0;}
-#roesan-extras .rs-footer a{color:inherit;text-decoration:none;}
-#roesan-extras .rs-footer a:hover{color:#89d4f0;}
-#roesan-extras .rs-footer-bottom{padding-top:22px;border-top:1px solid rgba(255,255,255,.10);font-size:11px;color:rgba(255,255,255,.45);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+*{box-sizing:border-box;}
+.rs-container{max-width:1100px;margin:0 auto;padding:0 28px;}
+.rs-section{padding:80px 0;position:relative;}
+.rs-eyebrow{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.20em;color:#61bbe4;display:inline-block;margin-bottom:14px;}
+.rs-eyebrow.on-dark{color:#89d4f0;}
+.rs-h2{font-family:'Philosopher',Georgia,serif;font-weight:500;font-size:clamp(28px,4vw,46px);margin:0 0 16px;line-height:1.1;letter-spacing:-.015em;color:#0f172a;}
+.rs-h2 em{font-style:italic;color:#51408d;}
+.rs-h2.on-dark{color:#fff;}
+.rs-h2.on-dark em{color:#89d4f0;}
+.rs-lead{font-size:18px;color:#64748b;line-height:1.55;font-weight:300;margin:0;max-width:620px;}
+.rs-section-head{max-width:720px;margin-bottom:44px;}
+.rs-note{margin-top:24px;padding:18px 22px;background:rgba(253,223,69,.10);border:1px solid rgba(253,223,69,.45);border-radius:14px;font-size:14px;color:#334155;line-height:1.55;display:flex;gap:12px;align-items:flex-start;}
+.rs-assist{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.rs-assist-card{background:#fff;border-radius:20px;padding:28px 24px;border:1px solid rgba(226,232,240,.8);position:relative;overflow:hidden;transition:all .3s ease;}
+.rs-assist-card:hover{transform:translateY(-5px);box-shadow:0 14px 36px rgba(15,23,42,.10);border-color:#a8e1f3;}
+.rs-assist-card .ico{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#a8e1f3,#61bbe4);color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 6px 16px rgba(97,187,228,.3);}
+.rs-assist-card .ico svg{width:22px;height:22px;}
+.rs-assist-card h4{font-weight:700;font-size:16px;color:#0f172a;margin:0 0 6px;}
+.rs-assist-card p{font-size:13px;color:#64748b;line-height:1.5;margin:0;}
+.rs-assist-card .num{position:absolute;top:22px;right:22px;font-family:'Philosopher',Georgia,serif;font-size:13px;color:#e2e8f0;font-weight:700;}
+.rs-stepper-wrap{background:linear-gradient(135deg,#1e103c 0%,#2a2960 100%);border-radius:28px;padding:52px;color:#fff;position:relative;overflow:hidden;}
+.rs-stepper-wrap::before{content:"";position:absolute;top:-100px;right:-100px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(97,187,228,.18),transparent 70%);}
+.rs-stepper-inner{position:relative;z-index:1;}
+.rs-stepper-head{max-width:580px;margin-bottom:36px;}
+.rs-stepper-head p{color:rgba(255,255,255,.75);font-size:16px;line-height:1.55;margin:0;}
+.rs-stepper{display:grid;grid-template-columns:260px 1fr;gap:36px;}
+.rs-step-list{display:flex;flex-direction:column;gap:5px;}
+.rs-step-item{display:flex;gap:14px;align-items:flex-start;padding:12px 14px;border-radius:12px;cursor:pointer;transition:all .25s;border:1px solid transparent;background:transparent;text-align:left;width:100%;font-family:'Roboto',sans-serif;color:rgba(255,255,255,.6);}
+.rs-step-item:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.9);}
+.rs-step-item.active{background:rgba(97,187,228,.10);color:#fff;border-color:rgba(97,187,228,.28);}
+.rs-step-item .num{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-family:'Philosopher',Georgia,serif;font-size:13px;font-weight:600;}
+.rs-step-item.active .num{background:#61bbe4;border-color:#61bbe4;color:#fff;}
+.rs-step-item.done .num{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.38);color:#4ade80;}
+.rs-step-item .label{font-size:13px;font-weight:500;padding-top:5px;}
+.rs-step-detail{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:20px;padding:32px;display:flex;flex-direction:column;justify-content:space-between;min-height:300px;}
+.rs-step-detail .step-num{font-family:'Philosopher',Georgia,serif;font-size:72px;line-height:1;color:rgba(97,187,228,.25);font-weight:500;margin-bottom:6px;}
+.rs-step-detail h3{font-family:'Philosopher',Georgia,serif;font-weight:500;font-size:26px;color:#fff;margin:0 0 10px;line-height:1.15;}
+.rs-step-detail p{font-size:15px;color:rgba(255,255,255,.75);line-height:1.6;margin:0;}
+.rs-step-action{margin-top:20px;display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:9999px;background:rgba(97,187,228,.14);border:1px solid rgba(97,187,228,.28);color:#a8e1f3;font-size:13px;font-weight:600;width:fit-content;}
+.rs-step-progress{display:flex;gap:5px;margin-top:20px;}
+.rs-step-progress .dot{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.10);transition:background .3s;}
+.rs-step-progress .dot.active{background:#89d4f0;}
+.rs-roesan-cta{margin-top:28px;padding:22px 26px;background:rgba(253,223,69,.08);border:1px solid rgba(253,223,69,.28);border-radius:18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.rs-roesan-cta .badge{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:#fddf45;color:#2a2960;display:flex;align-items:center;justify-content:center;}
+.rs-roesan-cta .badge svg{width:22px;height:22px;}
+.rs-roesan-cta .txt strong{display:block;color:#fff;font-size:15px;margin-bottom:3px;}
+.rs-roesan-cta .txt span{color:rgba(255,255,255,.75);font-size:13px;line-height:1.5;}
+.rs-cross{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.rs-cross-card{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:3/4;cursor:pointer;transition:all .4s;display:block;text-decoration:none;background:#cbd5e1;}
+.rs-cross-card:hover{transform:translateY(-6px);box-shadow:0 20px 44px rgba(15,23,42,.18);}
+.rs-cross-card .ovl{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.85) 0%,rgba(15,23,42,.45) 40%,transparent 100%);}
+.rs-cross-card .info{position:absolute;bottom:0;left:0;right:0;padding:22px;color:#fff;z-index:2;}
+.rs-cross-card .accent{width:30px;height:3px;background:#89d4f0;margin-bottom:10px;transition:width .4s;border-radius:2px;}
+.rs-cross-card:hover .accent{width:52px;}
+.rs-cross-card h4{font-family:'Philosopher',Georgia,serif;font-weight:500;font-size:20px;margin:0 0 4px;color:#fff;}
+.rs-cross-card p{font-size:12px;color:rgba(255,255,255,.82);margin:0;line-height:1.4;}
+.rs-cross-card .cta{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:600;color:#a8e1f3;text-transform:uppercase;letter-spacing:.1em;}
+.rs-footer{background:#1e103c;color:rgba(255,255,255,.7);padding:56px 0 28px;}
+.rs-footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:44px;margin-bottom:36px;}
+.rs-footer h5{color:#fff;font-size:12px;text-transform:uppercase;letter-spacing:.15em;margin:0 0 16px;font-weight:700;}
+.rs-footer .brand-name{font-family:'Philosopher',Georgia,serif;font-size:26px;font-weight:500;color:#fff;margin-bottom:10px;}
+.rs-footer p{font-size:13px;line-height:1.6;max-width:320px;color:rgba(255,255,255,.60);margin:0;}
+.rs-footer ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;}
+.rs-footer li{font-size:13px;color:rgba(255,255,255,.68);display:flex;align-items:center;gap:9px;}
+.rs-footer li svg{width:13px;height:13px;color:#89d4f0;flex-shrink:0;}
+.rs-footer a{color:inherit;text-decoration:none;}
+.rs-footer a:hover{color:#89d4f0;}
+.rs-footer-bottom{padding-top:22px;border-top:1px solid rgba(255,255,255,.10);font-size:11px;color:rgba(255,255,255,.45);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 @media(max-width:900px){
-  #roesan-extras .rs-section{padding:52px 0;}
-  #roesan-extras .rs-assist,#roesan-extras .rs-cross{grid-template-columns:repeat(2,1fr);}
-  #roesan-extras .rs-stepper{grid-template-columns:1fr;}
-  #roesan-extras .rs-stepper-wrap{padding:32px 22px;}
-  #roesan-extras .rs-footer-grid{grid-template-columns:1fr;}
+  .rs-section{padding:52px 0;}
+  .rs-assist,.rs-cross{grid-template-columns:repeat(2,1fr);}
+  .rs-stepper{grid-template-columns:1fr;}
+  .rs-stepper-wrap{padding:32px 22px;}
+  .rs-footer-grid{grid-template-columns:1fr;}
 }
 @media(max-width:480px){
-  #roesan-extras .rs-assist,#roesan-extras .rs-cross{grid-template-columns:1fr;}
+  .rs-assist,.rs-cross{grid-template-columns:1fr;}
 }
 </style>
 
-<!-- ASISTENCIAS -->
-<section class="rs-section" style="background:#f8fafc;">
-  <div class="rs-container">
-    <div class="rs-section-head">
-      <span class="rs-eyebrow">Beneficios incluidos en tu póliza</span>
-      <h2 class="rs-h2">Asistencias 24/7, todo el año</h2>
-      <p class="rs-lead">No solo cubrimos el siniestro grande. La aseguradora seleccionada te respalda también en los días normales: el pinchazo, la batería, la llave perdida.</p>
-    </div>
-    <div class="rs-assist">
-      ${beneficiosHtml}
-    </div>
-    <div class="rs-note">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <div><strong>Estas asistencias las presta la aseguradora que selecciones</strong>, no Roesan. Las coberturas exactas, topes y condiciones dependen de la póliza emitida. Te recomendamos siempre <strong>informarnos también a nosotros</strong> para hacer el acompañamiento y agilizar con la aseguradora cualquier trámite que necesites.</div>
-    </div>
-  </div>
-</section>
 
 <!-- STEPPER SINIESTRO -->
 <section class="rs-section">
@@ -934,6 +935,99 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
           <div class="rs-step-detail" id="rs-step-detail"></div>
         </div>
 
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LINEAS ASISTENCIA -->
+<section class="rs-section" style="background:#f8fafc;">
+  <div class="rs-container">
+    <div class="rs-section-head">
+      <span class="rs-eyebrow">En caso de siniestro</span>
+      <h2 class="rs-h2">Líneas de <em>asistencia directa</em></h2>
+      <p class="rs-lead">Ante cualquier emergencia, comunícate directamente con tu aseguradora. Estas son sus líneas 24/7.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px">
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">HDI</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:224" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#224</a>
+          <a href="tel:6013077050" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>601-307-7050</a>
+          <a href="tel:018000113390" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>01 8000 113 390</a>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">SURA</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:888" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#888</a>
+          <a href="tel:6014897941" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>601-489-7941</a>
+          <a href="tel:018000518888" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>01 8000 51 8888</a>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">Bolívar</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:322" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#322</a>
+          <a href="tel:6013811151" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>601-381-1151</a>
+          <a href="tel:018000123322" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>018000 123322</a>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">AXA Colpatria</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:247" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#247</a>
+          <a href="tel:6014235757" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>601-423-5757</a>
+          <a href="tel:018000512620" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>01-8000-512620</a>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">Seg. del Estado</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:224" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#224</a>
+          <a href="tel:6014434818" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>601-443-4818</a>
+          <a href="tel:018000123010" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>01 8000 123 010</a>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">Allianz</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:265" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#265</a>
+          <a href="tel:6015941133" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>601-594-1133</a>
+          <a href="tel:018000513500" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>018000 513500</a>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">Mapfre</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:624" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#624</a>
+          <a href="tel:6013077024" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>601-307-7024</a>
+          <a href="tel:91519800001" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>91 519 8000 01</a>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">Qualitas</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:963" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#963</a>
+          <a href="tel:6016579650" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>601-657-9650</a>
+          <a href="tel:18000189873" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>18000189873</a>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">Previsora</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:345" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#345</a>
+          <a href="tel:6013487555" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>601-348-7555</a>
+          <a href="tel:018000910554" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>01 8000 910 554</a>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:15px;color:#0f172a;margin-bottom:12px">SBS</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="tel:360" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📱</span>#360</a>
+          <a href="tel:3183900000" style="font-size:12px;color:#64748b;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">📞</span>318-390-0000</a>
+          <a href="tel:018000911360" style="font-size:12px;color:#51408d;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px"><span style="font-size:14px">☎️</span>01 8000 911360</a>
+        </div>
       </div>
     </div>
   </div>
