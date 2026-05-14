@@ -608,17 +608,17 @@ function redactarCorreo(){
   if(!STATE.quoteUrl){showToast('Primero debes generar el enlace de cotización.');return;}
   const d=_emailData();
   const subject='Cotización seguro todo riesgo para su vehículo';
-  const html=_emailHtml(d);
   const gmailUrl='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subject);
+  // Abrir Gmail síncronamente (dentro del evento click) para evitar bloqueo de popup
+  window.open(gmailUrl,'_blank');
+  // Luego copiar el HTML al portapapeles
+  const html=_emailHtml(d);
   const blob=new Blob([html],{type:'text/html'});
   navigator.clipboard.write([new ClipboardItem({'text/html':blob})]).then(()=>{
-    window.open(gmailUrl,'_blank');
-    showToast('✓ Correo copiado — pégalo en Gmail con Cmd+V / Ctrl+V');
+    showToast('✓ Gmail abierto — haz clic en el cuerpo y pega con Cmd+V / Ctrl+V');
   }).catch(()=>{
-    // Fallback: plain text copy
     navigator.clipboard.writeText(_emailBody(d)).then(()=>{
-      window.open(gmailUrl,'_blank');
-      showToast('✓ Texto copiado — pégalo en Gmail con Cmd+V / Ctrl+V');
+      showToast('✓ Gmail abierto — pega el texto con Cmd+V / Ctrl+V');
     });
   });
 }
