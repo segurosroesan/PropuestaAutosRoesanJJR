@@ -622,7 +622,7 @@ function buildHTML(ext,an,beneficios,polizaPdf){
         <div style="display:flex;flex-direction:column;gap:7px;align-items:flex-start">
           <a class="qbtn" href="https://wa.me/573197282277?text=${waMsg}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9999px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:12px;white-space:nowrap;box-shadow:0 3px 10px rgba(37,211,102,0.3)">
             <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.553 4.103 1.523 5.824L.057 23.428a.75.75 0 0 0 .915.915l5.604-1.466A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.732 9.732 0 0 1-4.964-1.355l-.356-.212-3.679.963.981-3.587-.232-.369A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
-            Seleccionar esta póliza
+            Seleccionar Esta
           </a>
           ${isRec&&polizaPdf?`<a href="data:application/pdf;base64,${polizaPdf}" download="propuesta-${q.aseguradora.replace(/\s+/g,'-')}.pdf" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9999px;background:#f1f5f9;color:#334155;text-decoration:none;font-weight:700;font-size:12px;white-space:nowrap;border:1px solid #e2e8f0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>Ver PDF póliza</a>`:''}
         </div>
@@ -642,7 +642,7 @@ function buildHTML(ext,an,beneficios,polizaPdf){
     ['Marca',ext.vehiculo.marca],['Línea',ext.vehiculo.linea],
     ['Modelo / Año',ext.vehiculo.año],['Placa',ext.vehiculo.placa],
     ['Ciudad',ext.vehiculo.ciudad],['Valor asegurado',specsValor],
-    ['Conductor',ext.cliente.nombre],
+    ['Propietario',ext.cliente.nombre],
     ['Cotización',`Folio ${ext.folio} · ${ext.cotizaciones.length} aseguradoras`]
   ];
 
@@ -750,7 +750,7 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
   <span class="eyebrow">Análisis Roesan</span>
   <h2 style="color:white">Nuestra <em style="color:#61bbe4;font-style:italic">recomendación experta</em></h2>
   <p style="font-size:17px;color:rgba(255,255,255,.72);line-height:1.6;font-weight:300;margin-bottom:36px;text-align:justify">${an.analisis_general}</p>
-  <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px" class="cgrid">
+  <div style="display:flex;flex-direction:column;gap:24px;max-width:680px;margin:0 auto" class="cgrid">
     <div style="background:rgba(255,255,255,.06);border:1px solid rgba(97,187,228,.25);border-radius:20px;padding:30px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:#61bbe4;margin-bottom:12px">Opción recomendada</div>
       <div style="font-family:'Philosopher',Georgia,serif;font-size:26px;color:white;margin-bottom:4px">${an.recomendada}</div>
@@ -758,14 +758,7 @@ nav{background:rgba(255,255,255,0.93);backdrop-filter:blur(14px);border-bottom:1
       <p style="font-size:15px;color:rgba(255,255,255,.82);line-height:1.6;margin-bottom:18px;text-align:justify">${an.razon_principal}</p>
       ${puntos}
     </div>
-    <div style="display:flex;flex-direction:column;gap:16px">
-      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:24px">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:rgba(255,255,255,.5);margin-bottom:10px">Alternativa</div>
-        <div style="font-family:'Philosopher',Georgia,serif;font-size:20px;color:white;margin-bottom:6px">${an.alternativa}</div>
-        <p style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.6;text-align:justify">${an.razon_alternativa}</p>
-      </div>
-      <div style="background:rgba(253,223,69,.08);border:1px solid rgba(253,223,69,.3);border-radius:16px;padding:18px;font-size:13px;color:rgba(255,255,255,.85);line-height:1.55"><strong style="color:#fde68a">⚠ Importante:</strong> En caso de tratarse de una póliza nueva o de un cambio de aseguradora durante un proceso de renovación, la compañía aseguradora podrá solicitar, como requisito previo a la emisión de la póliza, una inspección del riesgo. Adicionalmente, algunas aseguradoras pueden requerir procesos de georreferenciación del vehículo mediante plataformas especializadas, como Cazador, según sus políticas de suscripción.</div>
-    </div>
+    <div style="background:rgba(253,223,69,.08);border:1px solid rgba(253,223,69,.3);border-radius:16px;padding:18px;font-size:13px;color:rgba(255,255,255,.85);line-height:1.55"><strong style="color:#fde68a">⚠ Importante:</strong> En caso de tratarse de una póliza nueva o de un cambio de aseguradora durante un proceso de renovación, la compañía aseguradora podrá solicitar, como requisito previo a la emisión de la póliza, una inspección del riesgo. Adicionalmente, algunas aseguradoras pueden requerir procesos de georreferenciación del vehículo mediante plataformas especializadas, como Cazador, según sus políticas de suscripción.</div>
   </div>
 </div></div>
 
