@@ -611,17 +611,36 @@ function redactarCorreo(){
   const subject='Cotización seguro todo riesgo para su vehículo';
   const gmailUrl='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subject);
   const blob=new Blob([_emailTableHtml(d)],{type:'text/html'});
-  // Iniciar escritura al portapapeles ANTES de abrir Gmail (página aún tiene foco)
-  const clipPromise=navigator.clipboard.write([new ClipboardItem({'text/html':blob})]);
-  // Abrir Gmail síncronamente (aún dentro del gesto de usuario)
-  window.open(gmailUrl,'_blank');
-  clipPromise.then(()=>{
-    showToast('✓ Gmail abierto — haz clic en el cuerpo y pega con Cmd+V / Ctrl+V');
+  navigator.clipboard.write([new ClipboardItem({'text/html':blob})]).then(()=>{
+    _mostrarModalGmail(gmailUrl,false);
   }).catch(()=>{
     navigator.clipboard.writeText(_emailBody(d)).then(()=>{
-      showToast('✓ Gmail abierto — pega el texto con Cmd+V / Ctrl+V');
+      _mostrarModalGmail(gmailUrl,true);
+    }).catch(()=>{
+      _mostrarModalGmail(gmailUrl,true);
     });
   });
+}
+
+function _mostrarModalGmail(gmailUrl,textoPlano){
+  const msg=textoPlano
+    ?'El texto del correo está en tu portapapeles.'
+    :'El correo con formato está listo en tu portapapeles.';
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML=`
+    <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:420px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.25)">
+      <div style="font-size:40px;margin-bottom:12px">📋</div>
+      <h3 style="margin:0 0 10px;font-size:18px;color:#0f172a">¡Correo copiado!</h3>
+      <p style="color:#475569;font-size:14px;line-height:1.6;margin:0 0 24px">${msg}<br><br>
+        Haz clic en <strong>Abrir Gmail</strong>, luego <strong>clic en el cuerpo</strong> del correo y pega con <strong>Cmd+V</strong> (Mac) o <strong>Ctrl+V</strong> (Windows).</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button onclick="this.closest('div[style*=inset]').remove()" style="padding:11px 22px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;color:#475569">Cancelar</button>
+        <a href="${gmailUrl}" target="_blank" onclick="setTimeout(()=>this.closest('div[style*=inset]').remove(),200)" style="padding:11px 22px;border-radius:10px;background:linear-gradient(135deg,#51408d,#61bbe4);color:#fff;text-decoration:none;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px">Abrir Gmail →</a>
+      </div>
+    </div>`;
+  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
+  document.body.appendChild(overlay);
 }
 
 function _emailTableHtml(d){
