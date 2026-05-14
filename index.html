@@ -123,6 +123,14 @@ textarea:focus{border-color:#51408d;background:#fff}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             Compartir enlace
           </button>
+          <button class="btn btn-ghost" onclick="redactarCorreo()" id="btnCorreo" disabled title="Primero genera el enlace de cotización">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            Redactar correo
+          </button>
+          <button class="btn btn-ghost" onclick="copiarCorreoFormato()" id="btnCorreoHtml" disabled title="Primero genera el enlace de cotización">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+            Copiar correo con formato
+          </button>
         </div>
       </div>
     </div>
@@ -245,7 +253,7 @@ textarea:focus{border-color:#51408d;background:#fff}
 if(location.hash.startsWith('#propuesta=')||new URLSearchParams(location.search).get('p')){document.body.style.visibility='hidden';}
 
 // ── Estado ────────────────────────────────────────────────────────
-let STATE = {phase:'upload', extracted:null, analysis:null, html:null, beneficios:null, polizaPdf:null};
+let STATE = {phase:'upload', extracted:null, analysis:null, html:null, beneficios:null, polizaPdf:null, quoteUrl:null};
 
 // ── Formato moneda COP ────────────────────────────────────────────
 function fmtCOP(n){
@@ -554,6 +562,118 @@ function downloadPdf(){
   setTimeout(()=>{win.print();},800);
 }
 
+
+// ── Correo al cliente ─────────────────────────────────────────────
+const ROESAN_LOGO_URL='https://roesan.com/logo-roesan.png';
+const ROESAN_WEBSITE='https://www.roesan.com';
+
+function _emailData(){
+  const ext=STATE.extracted||{};
+  return {
+    nombre: ext.cliente?.nombre||'[Nombre del cliente]',
+    placa:  ext.vehiculo?.placa||'[Placa del vehículo]',
+    asesor: ext.asesor?.nombre||'Adriana Garzón',
+    url:    STATE.quoteUrl||''
+  };
+}
+
+function _emailBody(d){
+return `Cordial saludo, ${d.nombre}.
+
+Esperamos que se encuentre muy bien.
+
+Adjuntamos el siguiente enlace donde podrá consultar la cotización del seguro todo riesgo para su vehículo de placa ${d.placa}:
+
+${d.url}
+
+En este enlace podrá comparar las diferentes alternativas disponibles con varias aseguradoras, revisar precios, coberturas y beneficios, y seleccionar la opción que mejor se ajuste a sus necesidades.
+
+Una vez elija la alternativa de su preferencia, en Roesan estaremos atentos para acompañarlo en todo el proceso de expedición de la póliza.
+
+Quedamos muy pendientes para resolver cualquier inquietud, explicarle las diferencias entre las opciones y ayudarle a tomar la mejor decisión.
+
+Adicionalmente, queremos recordarle que en Roesan no solo contamos con seguros de vehículos. Tenemos una amplia gama de soluciones para protegerlo a usted, a su familia y a su empresa, incluyendo seguros de vida, salud, hogar, responsabilidad civil, cumplimiento, empresariales, exequiales, entre otros.
+
+Será un gusto poder coordinar un espacio para asesorarlo de manera personalizada y revisar qué coberturas pueden ser útiles según sus necesidades actuales.
+
+Cualquier inquietud, quedamos muy atentos.
+
+Cordialmente,
+${d.asesor}
+Roesan Seguros
+${ROESAN_WEBSITE}`;
+}
+
+function redactarCorreo(){
+  if(!STATE.quoteUrl){showToast('Primero debes generar el enlace de cotización.');return;}
+  const d=_emailData();
+  const subject='Cotización seguro todo riesgo para su vehículo';
+  const body=_emailBody(d);
+  const gmailUrl='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  window.open(gmailUrl,'_blank');
+}
+
+function copiarCorreoFormato(){
+  if(!STATE.quoteUrl){showToast('Primero debes generar el enlace de cotización.');return;}
+  const d=_emailData();
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;background:#f1f5f9;font-family:'Helvetica Neue',Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 0">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.10);max-width:600px">
+  <!-- Header -->
+  <tr><td style="background:linear-gradient(135deg,#2a2960,#51408d);padding:28px 40px;text-align:center">
+    <a href="${ROESAN_WEBSITE}" target="_blank">
+      <img src="${ROESAN_LOGO_URL}" alt="Roesan Seguros" style="height:44px;width:auto;display:inline-block">
+    </a>
+  </td></tr>
+  <!-- Body -->
+  <tr><td style="padding:36px 40px 28px">
+    <p style="font-size:16px;color:#334155;line-height:1.6;margin:0 0 16px">Cordial saludo, <strong>${d.nombre}</strong>.</p>
+    <p style="font-size:15px;color:#475569;line-height:1.6;margin:0 0 16px">Esperamos que se encuentre muy bien.</p>
+    <p style="font-size:15px;color:#475569;line-height:1.6;margin:0 0 16px">Adjuntamos el siguiente enlace donde podrá consultar la cotización del seguro todo riesgo para su vehículo de placa <strong>${d.placa}</strong>:</p>
+    <!-- CTA -->
+    <table cellpadding="0" cellspacing="0" style="margin:24px 0">
+      <tr><td style="background:linear-gradient(135deg,#51408d,#61bbe4);border-radius:10px;padding:14px 28px;text-align:center">
+        <a href="${d.url}" target="_blank" style="color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:.02em">Ver cotización completa →</a>
+      </td></tr>
+    </table>
+    <p style="font-size:13px;color:#94a3b8;margin:0 0 24px;word-break:break-all">${d.url}</p>
+    <p style="font-size:15px;color:#475569;line-height:1.6;margin:0 0 12px">En este enlace podrá comparar las diferentes alternativas disponibles con varias aseguradoras, revisar precios, coberturas y beneficios, y seleccionar la opción que mejor se ajuste a sus necesidades.</p>
+    <p style="font-size:15px;color:#475569;line-height:1.6;margin:0 0 12px">Una vez elija la alternativa de su preferencia, en <a href="${ROESAN_WEBSITE}" style="color:#51408d;font-weight:600;text-decoration:none">Roesan</a> estaremos atentos para acompañarlo en todo el proceso de expedición de la póliza.</p>
+    <p style="font-size:15px;color:#475569;line-height:1.6;margin:0 0 12px">Quedamos muy pendientes para resolver cualquier inquietud, explicarle las diferencias entre las opciones y ayudarle a tomar la mejor decisión.</p>
+    <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">
+    <p style="font-size:15px;color:#475569;line-height:1.6;margin:0 0 12px">Adicionalmente, queremos recordarle que en <a href="${ROESAN_WEBSITE}" style="color:#51408d;font-weight:600;text-decoration:none">Roesan</a> no solo contamos con seguros de vehículos. Tenemos una amplia gama de soluciones para protegerlo a usted, a su familia y a su empresa, incluyendo seguros de vida, salud, hogar, responsabilidad civil, cumplimiento, empresariales, exequiales, entre otros.</p>
+    <p style="font-size:15px;color:#475569;line-height:1.6;margin:0 0 12px">Será un gusto poder coordinar un espacio para asesorarlo de manera personalizada y revisar qué coberturas pueden ser útiles según sus necesidades actuales.</p>
+    <p style="font-size:15px;color:#475569;line-height:1.6;margin:0">Cualquier inquietud, quedamos muy atentos.</p>
+  </td></tr>
+  <!-- Firma -->
+  <tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:24px 40px">
+    <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#0f172a">${d.asesor}</p>
+    <p style="margin:0 0 4px;font-size:13px;color:#64748b">Roesan Seguros</p>
+    <a href="${ROESAN_WEBSITE}" target="_blank" style="font-size:13px;color:#51408d;text-decoration:none;font-weight:600">${ROESAN_WEBSITE}</a>
+  </td></tr>
+  <!-- Footer -->
+  <tr><td style="background:#2a2960;padding:16px 40px;text-align:center">
+    <p style="margin:0;font-size:11px;color:rgba(255,255,255,.55)">© 2026 Organización de Seguros Roesan Ltda · <a href="${ROESAN_WEBSITE}" style="color:rgba(255,255,255,.55);text-decoration:none">roesan.com</a></p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
+
+  try{
+    const blob=new Blob([html],{type:'text/html'});
+    navigator.clipboard.write([new ClipboardItem({'text/html':blob})]).then(()=>{
+      showToast('✓ Correo con formato copiado — pégalo en Gmail');
+    }).catch(()=>{
+      // Fallback: copy plain text
+      navigator.clipboard.writeText(_emailBody(d)).then(()=>showToast('✓ Correo copiado como texto plano'));
+    });
+  }catch(e){
+    navigator.clipboard.writeText(_emailBody(d)).then(()=>showToast('✓ Correo copiado como texto plano'));
+  }
+}
+
 // ── Compartir enlace ──────────────────────────────────────────────
 async function compartirEnlace(){
   if(!STATE.extracted||!STATE.analysis)return;
@@ -568,6 +688,11 @@ async function compartirEnlace(){
     if(!res.ok)throw new Error();
     const {id}=await res.json();
     const url=location.origin+'/?p='+id;
+    STATE.quoteUrl=url;
+    document.getElementById('btnCorreo').disabled=false;
+    document.getElementById('btnCorreo').title='';
+    document.getElementById('btnCorreoHtml').disabled=false;
+    document.getElementById('btnCorreoHtml').title='';
     await navigator.clipboard.writeText(url).catch(()=>prompt('Copia este enlace:',url));
     showToast('✓ Enlace copiado — compártelo con tu cliente');
   }catch(e){
@@ -583,7 +708,7 @@ function showToast(msg){
 }
 
 // ── Reset ─────────────────────────────────────────────────────────
-function reset(){STATE={phase:'upload',extracted:null,analysis:null,html:null,beneficios:null,polizaPdf:null};show('upload');}
+function reset(){STATE={phase:'upload',extracted:null,analysis:null,html:null,beneficios:null,polizaPdf:null,quoteUrl:null};show('upload');}
 
 function loadDemo(){
   const ext={
