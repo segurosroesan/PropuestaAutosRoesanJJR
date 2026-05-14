@@ -610,8 +610,9 @@ function redactarCorreo(){
   const d=_emailData();
   const subject='Cotización seguro todo riesgo para su vehículo';
   const gmailUrl='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subject);
-  const blob=new Blob([_emailTableHtml(d)],{type:'text/html'});
-  navigator.clipboard.write([new ClipboardItem({'text/html':blob})]).then(()=>{
+  const htmlBlob=new Blob([_emailTableHtml(d)],{type:'text/html'});
+  const textBlob=new Blob([_emailBody(d)],{type:'text/plain'});
+  navigator.clipboard.write([new ClipboardItem({'text/html':htmlBlob,'text/plain':textBlob})]).then(()=>{
     _mostrarModalGmail(gmailUrl,false);
   }).catch(()=>{
     navigator.clipboard.writeText(_emailBody(d)).then(()=>{
@@ -644,7 +645,7 @@ function _mostrarModalGmail(gmailUrl,textoPlano){
 }
 
 function _emailTableHtml(d){
-  return `<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.10);max-width:600px">
+  return `<div style="font-family:'Helvetica Neue',Arial,sans-serif"><table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.10);max-width:600px">
   <!-- Header -->
   <tr><td style="background:linear-gradient(135deg,#2a2960,#51408d);padding:28px 40px;text-align:center">
     <a href="${ROESAN_WEBSITE}" target="_blank">
@@ -682,7 +683,7 @@ function _emailTableHtml(d){
     <table cellpadding="0" cellspacing="0" style="margin:0 auto 10px"><tr><td style="padding:0 8px"><a href="https://www.facebook.com/Roesanltda/" target="_blank" style="display:inline-block;text-decoration:none"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyOCAyOCI+PGNpcmNsZSBjeD0iMTQiIGN5PSIxNCIgcj0iMTQiIGZpbGw9IiMxODc3RjIiLz48cGF0aCBkPSJNMTggMTRoLTN2OWgtNHYtOUg5di00aDJ2LTJjMC0zIDEuMy00IDMuNS00IC45IDAgMS44LjEgMi41LjJWOGgtMmMtLjggMC0xIC41LTEgMXYxaDNsLS41IDR6IiBmaWxsPSIjZmZmIi8+PC9zdmc+" alt="Facebook" width="28" height="28" style="display:block;border-radius:4px"></a></td><td style="padding:0 8px"><a href="https://www.instagram.com/roesanseguros" target="_blank" style="display:inline-block;text-decoration:none"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyOCAyOCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJpZyIgeDE9IjAlIiB5MT0iMTAwJSIgeDI9IjEwMCUiIHkyPSIwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y1ODUyOSIvPjxzdG9wIG9mZnNldD0iNDAlIiBzdG9wLWNvbG9yPSIjZGQyYTdiIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjODEzNGFmIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjI4IiBoZWlnaHQ9IjI4IiByeD0iNyIgZmlsbD0idXJsKCNpZykiLz48cmVjdCB4PSI3IiB5PSI3IiB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHJ4PSI0IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMS41IiBmaWxsPSJub25lIi8+PGNpcmNsZSBjeD0iMTQiIGN5PSIxNCIgcj0iMy41IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMS41IiBmaWxsPSJub25lIi8+PGNpcmNsZSBjeD0iMTgiIGN5PSIxMCIgcj0iLjkiIGZpbGw9IiNmZmYiLz48L3N2Zz4=" alt="Instagram" width="28" height="28" style="display:block;border-radius:4px"></a></td><td style="padding:0 8px"><a href="https://co.linkedin.com/company/roesan-agencia-de-seguros" target="_blank" style="display:inline-block;text-decoration:none"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyOCAyOCI+PHJlY3Qgd2lkdGg9IjI4IiBoZWlnaHQ9IjI4IiByeD0iNSIgZmlsbD0iIzBBNjZDMiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik05IDEyaDN2OUg5em0xLjUtMWExLjUgMS41IDAgMTEwLTMgMS41IDEuNSAwIDAxMCAzem00IDFoM3YxLjNjLjUtLjkgMS41LTEuNiAyLjctMS42IDIuMyAwIDMuOCAxLjUgMy44IDQuNVYyMWgtM3YtNC41YzAtMS4xLS41LTEuNy0xLjQtMS43LTEuMSAwLTEuNi43LTEuNiAxLjdWMjFoLTN6Ii8+PC9zdmc+" alt="LinkedIn" width="28" height="28" style="display:block;border-radius:4px"></a></td><td style="padding:0 8px"><a href="https://wa.me/573126000414" target="_blank" style="display:inline-block;text-decoration:none"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyOCAyOCI+PGNpcmNsZSBjeD0iMTQiIGN5PSIxNCIgcj0iMTQiIGZpbGw9IiMyNUQzNjYiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMTQgNUM5IDUgNSA5IDUgMTRjMCAxLjYuNCAzLjEgMS4yIDQuNEw1IDIzbDQuOC0xLjNBOSA5IDAgMTAxNCA1em01IDEyLjVjLS4zLS4yLTItLjktMi4zLTFzLS41LS4yLS43LjItLjkgMS4xLTEuMSAxLjNjLS4yLjItLjMuMi0uNyAwYTguNyA4LjcgMCAwMS0yLjUtMS42Yy0uNy0uNy0xLjMtMS41LTEuNS0yLS4yLS40IDAtLjYuMi0uOGwuNC0uNWMuMS0uMi4xLS4zLjItLjZMMTAgMTFjLS4yLS41LS40LS40LS42LS40SDljLS4yIDAtLjYuMS0uOS40QTMuMyAzLjMgMCAwMDcuNSAxM2MwIDIgMS41IDQgMS43IDQuMyAyLjMgMy41IDQuOCA0IDUuNCA0YTMuMyAzLjMgMCAwMDIuNC0xLjEgMS4xIDEuMSAwIDAwLjItLjljLS4xLS4yLS4zLS4zLS41LS40eiIvPjwvc3ZnPg==" alt="WhatsApp" width="28" height="28" style="display:block;border-radius:4px"></a></td></tr></table>
     <p style="margin:0;font-size:11px;color:rgba(255,255,255,.55)">© 2026 Organización de Seguros Roesan Ltda · <a href="${ROESAN_WEBSITE}" style="color:rgba(255,255,255,.55);text-decoration:none">roesan.com</a></p>
   </td></tr>
-</table>`;
+</table></div>`;
 }
 
 function _emailHtml(d){
@@ -698,10 +699,10 @@ function _emailHtml(d){
 function copiarCorreoFormato(){
   if(!STATE.quoteUrl){showToast('Primero debes generar el enlace de cotización.');return;}
   const d=_emailData();
-  const html=_emailTableHtml(d);
+  const htmlBlob2=new Blob([_emailTableHtml(d)],{type:'text/html'});
+  const textBlob2=new Blob([_emailBody(d)],{type:'text/plain'});
   try{
-    const blob=new Blob([html],{type:'text/html'});
-    navigator.clipboard.write([new ClipboardItem({'text/html':blob})]).then(()=>{
+    navigator.clipboard.write([new ClipboardItem({'text/html':htmlBlob2,'text/plain':textBlob2})]).then(()=>{
       showToast('✓ Correo con formato copiado — pégalo en Gmail');
     }).catch(()=>{
       navigator.clipboard.writeText(_emailBody(d)).then(()=>showToast('✓ Correo copiado como texto plano'));
