@@ -608,15 +608,23 @@ function redactarCorreo(){
   if(!STATE.quoteUrl){showToast('Primero debes generar el enlace de cotización.');return;}
   const d=_emailData();
   const subject='Cotización seguro todo riesgo para su vehículo';
-  const body=_emailBody(d);
-  const gmailUrl='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
-  window.open(gmailUrl,'_blank');
+  const html=_emailHtml(d);
+  const gmailUrl='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subject);
+  const blob=new Blob([html],{type:'text/html'});
+  navigator.clipboard.write([new ClipboardItem({'text/html':blob})]).then(()=>{
+    window.open(gmailUrl,'_blank');
+    showToast('✓ Correo copiado — pégalo en Gmail con Cmd+V / Ctrl+V');
+  }).catch(()=>{
+    // Fallback: plain text copy
+    navigator.clipboard.writeText(_emailBody(d)).then(()=>{
+      window.open(gmailUrl,'_blank');
+      showToast('✓ Texto copiado — pégalo en Gmail con Cmd+V / Ctrl+V');
+    });
+  });
 }
 
-function copiarCorreoFormato(){
-  if(!STATE.quoteUrl){showToast('Primero debes generar el enlace de cotización.');return;}
-  const d=_emailData();
-  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;background:#f1f5f9;font-family:'Helvetica Neue',Arial,sans-serif">
+function _emailHtml(d){
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;background:#f1f5f9;font-family:'Helvetica Neue',Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 0">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,.10);max-width:600px">
@@ -660,13 +668,17 @@ function copiarCorreoFormato(){
 </td></tr>
 </table>
 </body></html>`;
+}
 
+function copiarCorreoFormato(){
+  if(!STATE.quoteUrl){showToast('Primero debes generar el enlace de cotización.');return;}
+  const d=_emailData();
+  const html=_emailHtml(d);
   try{
     const blob=new Blob([html],{type:'text/html'});
     navigator.clipboard.write([new ClipboardItem({'text/html':blob})]).then(()=>{
       showToast('✓ Correo con formato copiado — pégalo en Gmail');
     }).catch(()=>{
-      // Fallback: copy plain text
       navigator.clipboard.writeText(_emailBody(d)).then(()=>showToast('✓ Correo copiado como texto plano'));
     });
   }catch(e){
