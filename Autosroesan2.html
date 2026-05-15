@@ -611,16 +611,40 @@ function redactarCorreo(){
   const d=_emailData();
   const subject='Cotización seguro todo riesgo para su vehículo';
   const gmailUrl='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subject);
-  const htmlBlob=new Blob([_emailTableHtml(d)],{type:'text/html'});
-  const textBlob=new Blob([_emailBody(d)],{type:'text/plain'});
-  navigator.clipboard.write([new ClipboardItem({'text/html':htmlBlob,'text/plain':textBlob})]).then(()=>{
-    _mostrarModalGmail(gmailUrl,false);
-  }).catch(()=>{
-    navigator.clipboard.writeText(_emailBody(d)).then(()=>{
-      _mostrarModalGmail(gmailUrl,true);
-    }).catch(()=>{
-      _mostrarModalGmail(gmailUrl,true);
-    });
+  _copiarEmailAlPortapapeles(_emailTableHtml(d),_emailBody(d)).then(ok=>{
+    _mostrarModalGmail(gmailUrl,!ok);
+  });
+}
+
+function _copiarEmailAlPortapapeles(html,fallbackText){
+  return new Promise(resolve=>{
+    // Render HTML in a hidden contenteditable, then copy as a real DOM selection.
+    // This avoids the Gmail duplication bug caused by navigator.clipboard.write().
+    const el=document.createElement('div');
+    el.contentEditable='true';
+    el.style.cssText='position:fixed;top:0;left:-9999px;width:600px;opacity:0.001;pointer-events:none;overflow:hidden';
+    el.innerHTML=html;
+    document.body.appendChild(el);
+    el.focus();
+    const range=document.createRange();
+    range.selectNodeContents(el);
+    const sel=window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    let ok=false;
+    try{ok=document.execCommand('copy');}catch(e){}
+    sel.removeAllRanges();
+    document.body.removeChild(el);
+    if(ok){resolve(true);return;}
+    // Fallback: Clipboard API
+    try{
+      const hb=new Blob([html],{type:'text/html'});
+      navigator.clipboard.write([new ClipboardItem({'text/html':hb})]).then(()=>resolve(true)).catch(()=>{
+        navigator.clipboard.writeText(fallbackText).then(()=>resolve(false)).catch(()=>resolve(false));
+      });
+    }catch(e){
+      navigator.clipboard.writeText(fallbackText).then(()=>resolve(false)).catch(()=>resolve(false));
+    }
   });
 }
 
@@ -698,17 +722,9 @@ function _emailHtml(d){
 function copiarCorreoFormato(){
   if(!STATE.quoteUrl){showToast('Primero debes generar el enlace de cotización.');return;}
   const d=_emailData();
-  const htmlBlob2=new Blob([_emailTableHtml(d)],{type:'text/html'});
-  const textBlob2=new Blob([_emailBody(d)],{type:'text/plain'});
-  try{
-    navigator.clipboard.write([new ClipboardItem({'text/html':htmlBlob2,'text/plain':textBlob2})]).then(()=>{
-      showToast('✓ Correo con formato copiado — pégalo en Gmail');
-    }).catch(()=>{
-      navigator.clipboard.writeText(_emailBody(d)).then(()=>showToast('✓ Correo copiado como texto plano'));
-    });
-  }catch(e){
-    navigator.clipboard.writeText(_emailBody(d)).then(()=>showToast('✓ Correo copiado como texto plano'));
-  }
+  _copiarEmailAlPortapapeles(_emailTableHtml(d),_emailBody(d)).then(ok=>{
+    showToast(ok?'✓ Correo con formato copiado — pégalo en Gmail':'✓ Correo copiado como texto plano');
+  });
 }
 
 // ── Compartir enlace ──────────────────────────────────────────────
